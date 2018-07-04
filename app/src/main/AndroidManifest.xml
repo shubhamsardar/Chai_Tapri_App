@@ -45,16 +45,25 @@
             android:name=".activities.MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar" />
-
-        <activity android:name=".activities.OrderHistoryActivity"
-            android:parentActivityName=".activities.LoginActivity">
+        <activity
+            android:name=".activities.OrderHistoryActivity"
+            android:parentActivityName=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity android:name=".activities.NewStockActivity"
+            android:parentActivityName=".activities.MainActivity"/>
+        <activity android:name=".activities.StockHistoryActivity"
+            android:parentActivityName=".activities.MainActivity"/>
+        <activity android:name=".activities.ManageItemsActivity"
+            android:parentActivityName=".activities.MainActivity"/>
+        <activity android:name=".activities.ManageItemsListActivity"
+            android:parentActivityName=".activities.ManageItemsActivity"/>
+        <activity android:name=".activities.ChangePinActivity"
+            android:parentActivityName=".activities.MainActivity"/>
     </application>
 
 </manifest>

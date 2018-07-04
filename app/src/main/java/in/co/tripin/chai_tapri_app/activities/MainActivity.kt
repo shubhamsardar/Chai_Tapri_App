@@ -72,16 +72,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 startActivity(intent)
             }
             R.id.nav_stocknew -> {
-
-            }
-            R.id.nav_manage -> {
-
+                val intent = Intent(this,NewStockActivity::class.java)
+                startActivity(intent)
             }
             R.id.nav_stockhistory -> {
-
+                val intent = Intent(this,StockHistoryActivity::class.java)
+                startActivity(intent)
             }
-            R.id.nav_changepin -> {
+            R.id.nav_manage -> {
+                val intent = Intent(this,ManageItemsActivity::class.java)
+                startActivity(intent)
+            }
 
+            R.id.nav_changepin -> {
+                val intent = Intent(this,ChangePinActivity::class.java)
+                startActivity(intent)
+            }
+
+            R.id.nav_logout -> {
+                val intent = Intent(this,SpalshActivity::class.java)
+                startActivity(intent)
+                finish()
             }
         }
 
