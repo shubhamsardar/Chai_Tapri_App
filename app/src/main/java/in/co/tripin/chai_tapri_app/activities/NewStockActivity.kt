@@ -9,7 +9,7 @@ class NewStockActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_stock)
-        title = "Add New Stock"
+        title = "Order New Stock"
 
     }
 }
