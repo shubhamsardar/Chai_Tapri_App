@@ -1,6 +1,15 @@
 package `in`.co.tripin.chai_tapri_app.activities
 
+import `in`.co.tripin.chai_tapri_app.Managers.Logger
+import `in`.co.tripin.chai_tapri_app.Managers.PreferenceManager
+import `in`.co.tripin.chai_tapri_app.POJOs.Bodies.LogInBody
+import `in`.co.tripin.chai_tapri_app.POJOs.Responces.LogInResponce
+import `in`.co.tripin.chai_tapri_app.POJOs.Responces.PendingOrdersResponce
 import `in`.co.tripin.chai_tapri_app.R
+import `in`.co.tripin.chai_tapri_app.adapters.PendingAdapter
+import `in`.co.tripin.chai_tapri_app.adapters.PendingOrdersInteractionCallback
+import `in`.co.tripin.chai_tapri_app.networking.APIService
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -8,25 +17,59 @@ import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Switch
+import android.widget.Toast
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import dmax.dialog.SpotsDialog
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.content_main.*
+import org.json.JSONObject
+import retrofit2.Response
+import java.util.HashMap
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, PendingOrdersInteractionCallback {
+
+
 
     lateinit var switch: Switch
+    private var dialog: AlertDialog? = null
+
+    lateinit var apiService: APIService
+    private var mCompositeDisposable: CompositeDisposable? = null
+    lateinit var preferenceManager: PreferenceManager
+    private var queue: RequestQueue? = null
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-        title = "20 Orders Pending"
+        mCompositeDisposable = CompositeDisposable()
+        apiService = APIService.create()
+        preferenceManager = PreferenceManager.getInstance(this)
+        queue = Volley.newRequestQueue(this)
+
+
+        pendinglist.layoutManager = LinearLayoutManager(this)
+        title = "Fetching..."
 
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Refreshing List ...", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+//            Snackbar.make(view, "Refreshing List ...", Snackbar.LENGTH_LONG)
+//                    .setAction("Action", null).show()
+            fetchPendingOrders()
         }
 
         val toggle = ActionBarDrawerToggle(
@@ -35,6 +78,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
+
+        dialog = SpotsDialog.Builder()
+                .setContext(this)
+                .setCancelable(false)
+                .setMessage("Loading")
+                .build()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        fetchPendingOrders()
+    }
+
+    private fun fetchPendingOrders() {
+
+        title = "Fetching..."
+        mCompositeDisposable?.add(apiService.getPendingOrders(preferenceManager.accessToken)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(this::handleResponse, this::handleError))
+
     }
 
     override fun onBackPressed() {
@@ -55,9 +119,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        when (item.itemId) {
-            R.id.action_settings -> return true
-            else -> return super.onOptionsItemSelected(item)
+        return when (item.itemId) {
+            R.id.action_settings -> true
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -90,6 +154,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
             R.id.nav_logout -> {
+                preferenceManager.clearLoginPreferences()
                 val intent = Intent(this,SpalshActivity::class.java)
                 startActivity(intent)
                 finish()
@@ -98,5 +163,78 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    private fun handleResponse(responce: PendingOrdersResponce) {
+
+        Log.v("OnResponcePending: ",responce.status)
+        pendinglist.adapter = PendingAdapter(responce.data,this,  this)
+        val size:Int = responce.data.size
+        when(size){
+            0 ->{
+                title = "No Orders for you"
+            }
+            1 ->{
+                title = "$size Order Pending"
+            }
+            else ->{
+                title = "$size Orders Pending"
+            }
+        }
+
+    }
+
+    private fun handleError(error: Throwable) {
+        Log.v("OnErrorPending",error.toString())
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mCompositeDisposable?.clear()
+    }
+
+    override fun onOrderAccepted(mOrderId: String?) {
+        callEditOrderAPI(mOrderId,"accepted")
+
+    }
+
+    override fun onOrderRejected(mOrderId: String?) {
+        callEditOrderAPI(mOrderId,"rejected")
+    }
+
+    override fun onOrderSent(mOrderId: String?) {
+        callEditOrderAPI(mOrderId,"sent")
+    }
+
+    override fun onCalledCustomer(mMobile: String?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    private fun callEditOrderAPI(mOrderId: String?, mOperation :String) {
+
+        Logger.v("Marking Order Recived")
+        dialog!!.show()
+        val url = "http://192.168.1.21:3055/api/v2/order/$mOrderId/status/$mOperation"
+        val getRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
+                com.android.volley.Response.Listener<JSONObject> { response ->
+                    // display response
+                    Logger.v("Response :" + response.toString())
+                    Toast.makeText(this,mOperation, Toast.LENGTH_LONG).show()
+                },
+                com.android.volley.Response.ErrorListener { error ->
+                    dialog!!.dismiss()
+                    Logger.d("Error.Response: " + error.toString())
+                    Toast.makeText(applicationContext, "Server Error", Toast.LENGTH_SHORT).show()
+                }
+        ) {
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["token"] = preferenceManager!!.getAccessToken()
+                return params
+            }
+        }
+        queue!!.add(getRequest)
     }
 }

@@ -45,10 +45,13 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         mCompositeDisposable = CompositeDisposable()
+        apiSetvice = APIService.create()
+        preferenceManager = PreferenceManager.getInstance(this)
+
+
         title = "Log In"
         init()
         setListners()
-        apiSetvice = APIService.create()
     }
 
 
@@ -60,7 +63,6 @@ class LoginActivity : AppCompatActivity() {
 
         awesomeValidation = AwesomeValidation(ValidationStyle.BASIC)
         addValidations()
-        preferenceManager = PreferenceManager.getInstance(this)
 
     }
 
@@ -111,9 +113,11 @@ class LoginActivity : AppCompatActivity() {
                 //save data to shared preferences
 
                 preferenceManager.accessToken = responce.headers().get("token")
+                Log.v("token: ",preferenceManager.accessToken)
                 preferenceManager.mobileNo = loginResponce.data.mobile
                 val intent = Intent(this,MainActivity::class.java)
                 startActivity(intent)
+                finish()
             }
         }
 

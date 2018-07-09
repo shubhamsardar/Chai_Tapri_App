@@ -3,6 +3,7 @@
     package="in.co.tripin.chai_tapri_app">
 
 
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application

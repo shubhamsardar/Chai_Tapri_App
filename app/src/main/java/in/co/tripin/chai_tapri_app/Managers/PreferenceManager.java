@@ -91,7 +91,7 @@ public class PreferenceManager {
 
 
     public boolean isLogin() {
-        String tapriId = sInstance.getString(PREF_TAPRI_ID, null);
+        String tapriId = sInstance.getString(PREF_ACCESS_TOKEN, null);
 
         if (tapriId == null || tapriId.isEmpty()) {
             return false;
@@ -152,12 +152,10 @@ public class PreferenceManager {
 
 
     public void clearLoginPreferences() {
-        //setting GCM id before clearing since it would be required when user sign's in again.
-        String gcmId = getFCMId();
-        String accessToken = getAccessToken();
+        //setting FCM id before clearing since it would be required when user sign's in again.
+        String fcmId = getFCMId();
         editor.clear();
-        setFCMId(gcmId);
-        setAccessToken(accessToken);
+        setFCMId(fcmId);
         editor.commit();
     }
 

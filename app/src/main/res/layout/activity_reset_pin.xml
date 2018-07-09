@@ -44,7 +44,7 @@
         android:cursorVisible="true"
         android:inputType="number"
         android:padding="5dp"
-        android:textColor="@color/colorAccent"
+        android:textColor="@android:color/background_dark"
         android:textSize="18sp"
         app:cursorColor="@color/colorPrimaryDark"
         app:cursorWidth="2dp"
