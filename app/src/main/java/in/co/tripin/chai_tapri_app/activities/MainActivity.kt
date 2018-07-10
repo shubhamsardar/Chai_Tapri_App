@@ -61,29 +61,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         apiService = APIService.create()
         preferenceManager = PreferenceManager.getInstance(this)
         queue = Volley.newRequestQueue(this)
-
-
         pendinglist.layoutManager = LinearLayoutManager(this)
-        title = "Fetching..."
-
-        fab.setOnClickListener { view ->
-//            Snackbar.make(view, "Refreshing List ...", Snackbar.LENGTH_LONG)
-//                    .setAction("Action", null).show()
-            fetchPendingOrders()
-        }
-
-        val toggle = ActionBarDrawerToggle(
-                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawer_layout.addDrawerListener(toggle)
-        toggle.syncState()
-
-        nav_view.setNavigationItemSelectedListener(this)
-
         dialog = SpotsDialog.Builder()
                 .setContext(this)
                 .setCancelable(false)
                 .setMessage("Loading")
                 .build()
+        title = "Fetching..."
+        val toggle = ActionBarDrawerToggle(
+                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawer_layout.addDrawerListener(toggle)
+        toggle.syncState()
+        nav_view.setNavigationItemSelectedListener(this)
+        fab.setOnClickListener {
+            fetchPendingOrders()
+        }
+
     }
 
     override fun onStart() {
@@ -219,8 +212,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val getRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 com.android.volley.Response.Listener<JSONObject> { response ->
                     // display response
-                    Logger.v("Response :" + response.toString())
+                    dialog!!.dismiss()
+                    Logger.v("ResponseEdit :" + response.toString())
                     Toast.makeText(this,mOperation, Toast.LENGTH_LONG).show()
+                    fetchPendingOrders()
+
                 },
                 com.android.volley.Response.ErrorListener { error ->
                     dialog!!.dismiss()
@@ -231,7 +227,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             override fun getHeaders(): MutableMap<String, String> {
                 val params = HashMap<String, String>()
-                params["token"] = preferenceManager!!.getAccessToken()
+                params["token"] = preferenceManager!!.accessToken
                 return params
             }
         }

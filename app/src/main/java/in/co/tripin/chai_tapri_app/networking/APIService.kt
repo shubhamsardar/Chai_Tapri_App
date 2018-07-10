@@ -32,7 +32,7 @@ public interface APIService {
     abstract fun resetPassword(@Body body: ResetPassBody): Observable<ResetPassResponce>
 
 
-    @GET("v2/tapri/orders?type=ordered")
+    @GET("v2/tapri/orders?type=pending")
     abstract fun getPendingOrders(@Header("token")  token :String): Observable<PendingOrdersResponce>
 
 
@@ -49,7 +49,7 @@ public interface APIService {
             val retrofit = Retrofit.Builder()
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
-                    .baseUrl("http://139.59.70.142:3055/api/")
+                    .baseUrl("http://192.168.1.21:3055/api/")
                     .build()
 
             return retrofit.create(APIService::class.java)

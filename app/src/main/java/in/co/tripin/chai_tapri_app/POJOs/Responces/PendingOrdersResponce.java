@@ -52,7 +52,7 @@ public class PendingOrdersResponce {
         private String paymentType;
         @SerializedName("totalAmount")
         @Expose
-        private Integer totalAmount;
+        private Double totalAmount;
         @SerializedName("tapriId")
         @Expose
         private TapriId tapriId;
@@ -126,11 +126,11 @@ public class PendingOrdersResponce {
             this.paymentType = paymentType;
         }
 
-        public Integer getTotalAmount() {
+        public Double getTotalAmount() {
             return totalAmount;
         }
 
-        public void setTotalAmount(Integer totalAmount) {
+        public void setTotalAmount(Double totalAmount) {
             this.totalAmount = totalAmount;
         }
 
@@ -205,7 +205,7 @@ public class PendingOrdersResponce {
             private String itemName;
             @SerializedName("amount")
             @Expose
-            private Integer amount;
+            private Double amount;
             @SerializedName("itemId")
             @Expose
             private String itemId;
@@ -224,11 +224,11 @@ public class PendingOrdersResponce {
                 this.itemName = itemName;
             }
 
-            public Integer getAmount() {
+            public Double getAmount() {
                 return amount;
             }
 
-            public void setAmount(Integer amount) {
+            public void setAmount(Double amount) {
                 this.amount = amount;
             }
 

@@ -1,8 +1,11 @@
 package `in`.co.tripin.chai_tapri_app.adapters
 
+import `in`.co.tripin.chai_tapri_app.Managers.Logger
 import `in`.co.tripin.chai_tapri_app.POJOs.Responces.PendingOrdersResponce
 import `in`.co.tripin.chai_tapri_app.R
+import android.annotation.SuppressLint
 import android.content.Context
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -21,15 +24,42 @@ class PendingAdapter(val data: List<PendingOrdersResponce.Datum>,
         return ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_order_pending, parent, false))
     }
 
+    @SuppressLint("ResourceType")
     override fun onBindViewHolder(holder: PendingAdapter.ViewHolder, position: Int) {
         holder.bindItems(data[position])
+        val status = data[position].orderStatus
+
+        if(status == "accepted"){
+            holder.b2.background = ContextCompat.getDrawable(context,R.drawable.button_main_selector)
+            holder.b2.text = "Send Order"
+            //holder.b2.setTextColor(ContextCompat.getColor(context,R.color.colorGreyLight))
+            holder.b1.text = "Contact Customer"
+        }else if(status == "on the way"){
+            holder.b2.background = null
+            holder.b2.text = "On the way!"
+            holder.b1.text = "Contact Customer"
+
+        }
 
         holder.b1.setOnClickListener{
-            pendingOrdersInteractionCallback.onOrderAccepted(data[position].id)
+
+            if(status == "accepted"){
+                pendingOrdersInteractionCallback.onCalledCustomer(data[position].id)
+            }else if(status == "ordered"){
+                pendingOrdersInteractionCallback.onOrderRejected(data[position].id)
+            }
+
         }
         holder.b2.setOnClickListener{
-            pendingOrdersInteractionCallback.onOrderRejected(data[position].id)
-
+            if(status == "accepted"){
+                pendingOrdersInteractionCallback.onOrderSent(data[position].id)
+            }else if(status == "ordered"){
+                pendingOrdersInteractionCallback.onOrderAccepted(data[position].id)
+//                holder.b2.background = ContextCompat.getDrawable(context,R.drawable.button_light_selector)
+//                holder.b2.text = "Send Order"
+//                //holder.b2.setTextColor(ContextCompat.getColor(context,R.color.colorGreyLight))
+//                holder.b1.text = "Contact Customer"
+            }
         }
 
     }

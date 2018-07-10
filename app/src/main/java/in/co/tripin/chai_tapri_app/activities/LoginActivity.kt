@@ -19,6 +19,7 @@ import android.R.attr.name
 import android.R.attr.data
 import android.util.Log
 import android.widget.EditText
+import android.widget.Toast
 import com.google.gson.Gson
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -112,12 +113,27 @@ class LoginActivity : AppCompatActivity() {
 
                 //save data to shared preferences
 
-                preferenceManager.accessToken = responce.headers().get("token")
-                Log.v("token: ",preferenceManager.accessToken)
-                preferenceManager.mobileNo = loginResponce.data.mobile
-                val intent = Intent(this,MainActivity::class.java)
-                startActivity(intent)
-                finish()
+                var isRole = false
+                for(role: LogInResponce.Data.Role in loginResponce.data.roles){
+                    if(role.roleType == "10016"){
+                        isRole = true
+                    }
+                }
+
+                if(isRole){
+                    preferenceManager.accessToken = responce.headers().get("token")
+                    Log.v("token: ",preferenceManager.accessToken)
+                    preferenceManager.mobileNo = loginResponce.data.mobile
+                    val intent = Intent(this,MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }else{
+                    Toast.makeText(applicationContext,"Not A User! Register First",Toast.LENGTH_LONG).show()
+                    val intent = Intent(this,SpalshActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+
             }
         }
 
@@ -126,6 +142,8 @@ class LoginActivity : AppCompatActivity() {
 
     private fun handleError(error: Throwable) {
         Log.v("OnErrorLogin",error.toString())
+        Toast.makeText(applicationContext,"Server Error!",Toast.LENGTH_LONG).show()
+
     }
 
 
