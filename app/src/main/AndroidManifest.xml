@@ -55,6 +55,8 @@
         </activity>
         <activity android:name=".activities.NewStockActivity"
             android:parentActivityName=".activities.MainActivity"/>
+        <activity android:name=".activities.OrderSummeryActivity"
+            android:parentActivityName=".activities.MainActivity"/>
         <activity android:name=".activities.StockHistoryActivity"
             android:parentActivityName=".activities.MainActivity"/>
         <activity android:name=".activities.ManageItemsActivity"

@@ -1,5 +1,8 @@
 package in.co.tripin.chai_tapri_app.POJOs.Responces;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 public class HubMenuResponce {
@@ -85,17 +88,26 @@ public class HubMenuResponce {
 
         public class Item implements Serializable
         {
-            private String category;
-
-            private String rate;
-
-            private String _id;
-
-            private String status;
-
-            private String name;
-
             private int quantity = 0;
+
+            @SerializedName("_id")
+            @Expose
+            private String id;
+            @SerializedName("name")
+            @Expose
+            private String name;
+            @SerializedName("rate")
+            @Expose
+            private Double rate;
+            @SerializedName("status")
+            @Expose
+            private Integer status;
+            @SerializedName("flag")
+            @Expose
+            private Integer flag;
+            @SerializedName("category")
+            @Expose
+            private String category;
 
             public int getQuantity() {
                 return quantity;
@@ -105,60 +117,58 @@ public class HubMenuResponce {
                 this.quantity = quantity;
             }
 
-            public String getCategory ()
-            {
-                return category;
+            public String getId() {
+                return id;
             }
 
-            public void setCategory (String category)
-            {
-                this.category = category;
+            public void setId(String id) {
+                this.id = id;
             }
 
-            public String getRate ()
-            {
-                return rate;
-            }
-
-            public void setRate (String rate)
-            {
-                this.rate = rate;
-            }
-
-            public String get_id ()
-            {
-                return _id;
-            }
-
-            public void set_id (String _id)
-            {
-                this._id = _id;
-            }
-
-            public String getStatus ()
-            {
-                return status;
-            }
-
-            public void setStatus (String status)
-            {
-                this.status = status;
-            }
-
-            public String getName ()
-            {
+            public String getName() {
                 return name;
             }
 
-            public void setName (String name)
-            {
+            public void setName(String name) {
                 this.name = name;
+            }
+
+            public Double getRate() {
+                return rate;
+            }
+
+            public void setRate(Double rate) {
+                this.rate = rate;
+            }
+
+            public Integer getStatus() {
+                return status;
+            }
+
+            public void setStatus(Integer status) {
+                this.status = status;
+            }
+
+            public Integer getFlag() {
+                return flag;
+            }
+
+            public void setFlag(Integer flag) {
+                this.flag = flag;
+            }
+
+            public String getCategory() {
+                return category;
+            }
+
+            public void setCategory(String category) {
+                this.category = category;
             }
 
             @Override
             public String toString()
             {
-                return "ClassPojo [category = "+category+", rate = "+rate+", _id = "+_id+", status = "+status+", name = "+name+"]";
+                return "ClassPojo [category = "+category+", rate = "+rate+", _id = "+id+", status = "+status+", name = "+name+"]";
             }
         }
     }

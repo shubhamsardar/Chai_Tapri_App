@@ -43,7 +43,7 @@ public class PendingOrdersResponce {
         private String createdAt;
         @SerializedName("userId")
         @Expose
-        private String userId;
+        private UserId userId;
         @SerializedName("type")
         @Expose
         private String type;
@@ -102,11 +102,11 @@ public class PendingOrdersResponce {
             this.createdAt = createdAt;
         }
 
-        public String getUserId() {
+        public UserId getUserId() {
             return userId;
         }
 
-        public void setUserId(String userId) {
+        public void setUserId(UserId userId) {
             this.userId = userId;
         }
 
@@ -254,6 +254,44 @@ public class PendingOrdersResponce {
 
             public void setId(String id) {
                 this.id = id;
+            }
+
+        }
+
+        public class UserId {
+
+            @SerializedName("_id")
+            @Expose
+            private String id;
+            @SerializedName("fullName")
+            @Expose
+            private String fullName;
+            @SerializedName("mobile")
+            @Expose
+            private String mobile;
+
+            public String getId() {
+                return id;
+            }
+
+            public void setId(String id) {
+                this.id = id;
+            }
+
+            public String getFullName() {
+                return fullName;
+            }
+
+            public void setFullName(String fullName) {
+                this.fullName = fullName;
+            }
+
+            public String getMobile() {
+                return mobile;
+            }
+
+            public void setMobile(String mobile) {
+                this.mobile = mobile;
             }
 
         }

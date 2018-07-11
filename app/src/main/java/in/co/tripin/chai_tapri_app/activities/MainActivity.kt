@@ -50,6 +50,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var mCompositeDisposable: CompositeDisposable? = null
     lateinit var preferenceManager: PreferenceManager
     private var queue: RequestQueue? = null
+    lateinit var linearLayoutManager :LinearLayoutManager
+
 
 
 
@@ -61,7 +63,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         apiService = APIService.create()
         preferenceManager = PreferenceManager.getInstance(this)
         queue = Volley.newRequestQueue(this)
-        pendinglist.layoutManager = LinearLayoutManager(this)
+        linearLayoutManager = LinearLayoutManager(this)
+        linearLayoutManager.reverseLayout = true
+        linearLayoutManager.stackFromEnd = true
+        pendinglist.layoutManager = linearLayoutManager
         dialog = SpotsDialog.Builder()
                 .setContext(this)
                 .setCancelable(false)

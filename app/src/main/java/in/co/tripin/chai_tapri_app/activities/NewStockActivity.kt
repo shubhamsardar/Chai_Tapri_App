@@ -2,10 +2,18 @@ package `in`.co.tripin.chai_tapri_app.activities
 
 import `in`.co.tripin.chai_tapri_app.Managers.Logger
 import `in`.co.tripin.chai_tapri_app.Managers.PreferenceManager
+import `in`.co.tripin.chai_tapri_app.POJOs.Models.OrderSummeryPOJO
 import `in`.co.tripin.chai_tapri_app.POJOs.Models.UserAddress
+import `in`.co.tripin.chai_tapri_app.POJOs.Responces.HubItemsPojo
 import `in`.co.tripin.chai_tapri_app.POJOs.Responces.HubMenuResponce
-import `in`.co.tripin.chai_tapri_app.R
+import `in`.co.tripin.chai_tapri_app.POJOs.Responces.MappedHubResponce
+import `in`.co.tripin.chai_tapri_app.POJOs.Responces.PendingOrdersResponce
+import `in`.co.tripin.chai_tapri_app.adapters.ItemSelectionCallback
 import `in`.co.tripin.chai_tapri_app.adapters.ItemsListAdapter
+import `in`.co.tripin.chai_tapri_app.R
+import `in`.co.tripin.chai_tapri_app.adapters.PendingAdapter
+import `in`.co.tripin.chai_tapri_app.networking.APIService
+
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
@@ -14,6 +22,7 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -23,13 +32,26 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.google.gson.Gson
 import dmax.dialog.SpotsDialog
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_new_stock.*
+import kotlinx.android.synthetic.main.content_main.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.ArrayList
 import java.util.HashMap
 
 class NewStockActivity : AppCompatActivity() {
-    private var preferenceManager: PreferenceManager? = null
+
+
+    lateinit var preferenceManager: PreferenceManager
+    lateinit var apiService: APIService
+    private var mCompositeDisposable: CompositeDisposable? = null
+    lateinit var hubsData: MappedHubResponce
+    lateinit var hubsItemPojo : HubItemsPojo
+
+
 
     private var tapriId: String? = ""
     private var tapriName: String? = ""
@@ -40,6 +62,7 @@ class NewStockActivity : AppCompatActivity() {
     private var mTotalCost: Double? = 0.0
     private var mAvailableBalance: Double? = 0.0
     internal var mMoneyTobeAdded: Double? = 0.0
+
 
 
     private var mSnacksList: RecyclerView? = null
@@ -70,7 +93,11 @@ class NewStockActivity : AppCompatActivity() {
     private var mItemsToggleHeader: LinearLayout? = null
     private var mAddresseHeader: LinearLayout? = null
 
-    private var mChaihiyehll: LinearLayout? = null, private var mBeveragesll:LinearLayout? = null, private var mSnacksll:LinearLayout? = null, private var mExtrasll:LinearLayout? = null, private var mWalletInfo:LinearLayout? = null
+    private var mChaihiyehll: LinearLayout? = null
+    private var mBeveragesll:LinearLayout? = null
+    private var mSnacksll:LinearLayout? = null
+    private var mExtrasll:LinearLayout? = null
+    private var mWalletInfo:LinearLayout? = null
     private var mItemsToggleText: TextView? = null
     private var mItemsList: LinearLayout? = null
     private var dialog: AlertDialog? = null
@@ -79,9 +106,10 @@ class NewStockActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_stock)
-        title = "Tapri Details"
+        title = "Order New Stock"
         queue = Volley.newRequestQueue(this)
         gson = Gson()
+        preferenceManager = PreferenceManager.getInstance(this)
 
         dialog = SpotsDialog.Builder()
                 .setContext(this)
@@ -89,23 +117,48 @@ class NewStockActivity : AppCompatActivity() {
                 .setMessage("Fetching Menu")
                 .build()
 
+        mCompositeDisposable = CompositeDisposable()
+        apiService = APIService.create()
+
         init()
         setUpView()
         setListners()
 
-        //set title and id from intent
-        if (intent.extras != null) {
-            tapriName = intent.extras!!.getString("tapri_name")
-            title = tapriName
-            tapriId = intent.extras!!.getString("tapri_id")
-            if (tapriId!!.isEmpty()) {
-                finish()
-            } else {
-                //call tapri items api
-                hitTapriItemsListAPI()
-            }
+        //get hub and id from api
+        fetchAssignedHubDetails()
+
+
+    }
+
+    private fun fetchAssignedHubDetails() {
+        mCompositeDisposable?.add(apiService.getHubDetails(preferenceManager.accessToken)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(this::handleResponse, this::handleError))
+
+    }
+
+    private fun handleResponse(responce: MappedHubResponce) {
+
+        if(responce.status == "Success"){
+            Toast.makeText(applicationContext,"Connected to Hub",Toast.LENGTH_SHORT).show()
+            Log.v("OnResponceMappedTapri: ",responce.status)
+            preferenceManager.setHubId(responce.data.hubId)
+            hubsData = responce
+            preferenceManager.hubAddress = gson!!.toJson(responce.data.address)
+            hitHubtemsListAPI(responce.data.hubId)
+        }else{
+            Toast.makeText(applicationContext,"Error!",Toast.LENGTH_SHORT).show()
         }
 
+
+
+
+    }
+
+    private fun handleError(error: Throwable) {
+        Log.v("OnErrorMappedTapri",error.toString())
+        Toast.makeText(applicationContext,"Server Error!",Toast.LENGTH_SHORT).show()
 
     }
 
@@ -121,75 +174,72 @@ class NewStockActivity : AppCompatActivity() {
             }
         }
 
-        mAddresseHeader!!.setOnClickListener { startActivityForResult(Intent(this@TapriDetailsActivity, SelectAddressActivity::class.java), 1) }
-
-        mAddressInclude!!.setOnClickListener { startActivityForResult(Intent(this@TapriDetailsActivity, SelectAddressActivity::class.java), 1) }
 
         mProceedToPay!!.setOnClickListener {
-            val mItems = ArrayList<TapriMenuResponce.Data.Item>()
+            val mItems = ArrayList<HubItemsPojo.Data.Item>()
             var cost = 0.0
 
 
 
-            for (i in 0 until mChahiyehAdapter!!.data.length) {
+            for (i in 0 until mChahiyehAdapter!!.data.size) {
 
-                if (mChahiyehAdapter!!.data[i].getQuantity() !== 0) {
+                if (mChahiyehAdapter!!.data[i].quantity !== 0) {
 
                     mItems.add(mChahiyehAdapter!!.data[i])
                     var rate: Double? = 0.0
                     try {
-                        rate = java.lang.Double.parseDouble(mChahiyehAdapter!!.data[i].getRate())
+                        rate = mChahiyehAdapter!!.data[i].rate.toDouble()
                     } catch (e: NumberFormatException) {
                         Logger.v("Rate Invalid: cant convert to double")
                     }
 
-                    cost = cost + mChahiyehAdapter!!.data[i].getQuantity() * rate!!
+                    cost = cost + mChahiyehAdapter!!.data[i].quantity * rate!!
                 }
 
             }
-            for (i in 0 until mExtrasAdapter!!.data.length) {
+            for (i in 0 until mExtrasAdapter!!.data.size) {
 
-                if (mExtrasAdapter!!.data[i].getQuantity() !== 0) {
+                if (mExtrasAdapter!!.data[i].quantity !== 0) {
 
                     mItems.add(mExtrasAdapter!!.data[i])
                     var rate: Double? = 0.0
                     try {
-                        rate = java.lang.Double.parseDouble(mExtrasAdapter!!.data[i].getRate())
+                        rate = mExtrasAdapter!!.data[i].rate.toDouble()
                     } catch (e: NumberFormatException) {
                         Logger.v("Rate Invalid: cant convert to double")
                     }
 
-                    cost = cost + mExtrasAdapter!!.data[i].getQuantity() * rate!!
+                    cost = cost + mExtrasAdapter!!.data[i].quantity * rate!!
                 }
             }
-            for (i in 0 until mSnacksAdapter!!.data.length) {
+            for (i in 0 until mSnacksAdapter!!.data.size) {
 
-                if (mSnacksAdapter!!.data[i].getQuantity() !== 0) {
+                if (mSnacksAdapter!!.data[i].quantity !== 0) {
 
                     mItems.add(mSnacksAdapter!!.data[i])
                     var rate: Double? = 0.0
                     try {
-                        rate = java.lang.Double.parseDouble(mSnacksAdapter!!.data[i].getRate())
+                        rate = mSnacksAdapter!!.data[i].rate.toDouble()
                     } catch (e: NumberFormatException) {
                         Logger.v("Rate Invalid: cant convert to double")
                     }
 
-                    cost = cost + mSnacksAdapter!!.data[i].getQuantity() * rate!!
+                    cost = cost + mSnacksAdapter!!.data[i].quantity * rate!!
                 }
             }
-            for (i in 0 until mBeveragesAdapter!!.data.length) {
+            for (i in 0 until mBeveragesAdapter!!.data.size) {
 
-                if (mBeveragesAdapter!!.data[i].getQuantity() !== 0) {
+                if (mBeveragesAdapter!!.data[i].quantity !== 0) {
 
                     mItems.add(mBeveragesAdapter!!.data[i])
                     var rate: Double? = 0.0
                     try {
-                        rate = java.lang.Double.parseDouble(mBeveragesAdapter!!.data[i].getRate())
+                        rate = mBeveragesAdapter!!.data[i].rate.toDouble()
                     } catch (e: NumberFormatException) {
                         Logger.v("Rate Invalid: cant convert to double")
                     }
 
-                    cost = cost + mBeveragesAdapter!!.data[i].getQuantity() * rate!!
+                    cost += mBeveragesAdapter!!.data[i].quantity * rate!!
                 }
             }
 
@@ -198,12 +248,8 @@ class NewStockActivity : AppCompatActivity() {
                 Toast.makeText(applicationContext, "Address Required!", Toast.LENGTH_LONG).show()
             } else {
 
-                var paymentMethod = ""
-                if (mPaymentType!!.checkedRadioButtonId == R.id.radiocod) {
-                    paymentMethod = "COD"
-                } else if (mPaymentType!!.checkedRadioButtonId == R.id.radiowallet) {
-                    paymentMethod = "Wallet"
-                }
+                val paymentMethod = "COD"
+
 
                 val orderSummeryPOJO = OrderSummeryPOJO(tapriId,
                         tapriName,
@@ -212,20 +258,12 @@ class NewStockActivity : AppCompatActivity() {
                         paymentMethod,
                         mItems)
 
-                if (orderSummeryPOJO.getmItems().size() !== 0) {
-                    if (orderSummeryPOJO.getmPaymentMethod().equals("Wallet")) {
-                        if (mAvailableBalance < mTotalCost) {
-                            Toast.makeText(applicationContext, "Balance is Insufficient, Add Money!", Toast.LENGTH_LONG).show()
-                        } else {
-                            val i = Intent(this@TapriDetailsActivity, OrderSummeryActivity::class.java)
-                            i.putExtra("ordersummery", orderSummeryPOJO)
-                            startActivity(i)
-                        }
-                    } else {
-                        val i = Intent(this@TapriDetailsActivity, OrderSummeryActivity::class.java)
+                if (!orderSummeryPOJO.getmItems().isEmpty()) {
+
+                        val i = Intent(this@NewStockActivity, OrderSummeryActivity::class.java)
                         i.putExtra("ordersummery", orderSummeryPOJO)
                         startActivity(i)
-                    }
+
 
                 } else {
                     Toast.makeText(applicationContext, "Select Some Items!", Toast.LENGTH_LONG).show()
@@ -235,24 +273,8 @@ class NewStockActivity : AppCompatActivity() {
             }
         }
 
-        mPaymentType!!.setOnCheckedChangeListener { group, checkedId ->
-            if (checkedId == R.id.radiocod) {
-                mWalletInfo!!.setVisibility(View.INVISIBLE)
-            } else if (checkedId == R.id.radiowallet) {
-                mWalletInfo!!.setVisibility(View.VISIBLE)
-                FetchCurrentBalance()
 
-            }
-        }
 
-        mAddMoney!!.setOnClickListener {
-            val i = Intent(this@TapriDetailsActivity, WalletActivity::class.java)
-            if (mAvailableBalance < mTotalCost) {
-                val tobeadded = mTotalCost!! - mAvailableBalance!!
-                i.putExtra("money", "" + tobeadded)
-            }
-            startActivity(i)
-        }
     }
 
 
@@ -283,13 +305,9 @@ class NewStockActivity : AppCompatActivity() {
         mAddressCancel = findViewById(R.id.remove)
 
         mProceedToPay = findViewById(R.id.proceedtopay)
-        mPaymentType = findViewById(R.id.payment_type)
-        mBalance = findViewById(R.id.balance)
-        mAddMoney = findViewById(R.id.addmoney)
-        mPaymentHeader = findViewById(R.id.payment_title)
+
         mNoItems = findViewById(R.id.tv_noitems)
 
-        mWalletInfo = findViewById(R.id.llwalletinfo)
         mMainScroll = findViewById(R.id.mainscroll)
 
 
@@ -314,31 +332,31 @@ class NewStockActivity : AppCompatActivity() {
         preferenceManager = PreferenceManager.getInstance(this)
 
         mAddressCancel!!.visibility = View.GONE
-        if (preferenceManager!!.getDefaultAddress() == null) {
+        if (preferenceManager!!.getHubAddress() == null) {
             mAddressInclude!!.visibility = View.GONE
         } else {
             mAddressInclude!!.visibility = View.VISIBLE
-            address = gson!!.fromJson(preferenceManager!!.getDefaultAddress(), UserAddress.Data::class.java)
-            mAddressFull!!.setText(address!!.getFullAddressString())
+            address = gson!!.fromJson(preferenceManager!!.getHubAddress(), UserAddress.Data::class.java)
+            mAddressFull!!.text = address!!.fullAddressString
 
         }
 
     }
 
-    private fun hitTapriItemsListAPI() {
+    private fun hitHubtemsListAPI(hubId : String) {
 
         Logger.v("getting menu...")
         dialog!!.show()
-        val url = "http://139.59.70.142:3055/api/v1/tapri/$tapriId/items"
+        val url = "http://192.168.1.21:3055/api/v1/hub/$hubId/items"
 
         val getRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 Response.Listener { response ->
                     // display response
                     //Toast.makeText(getApplicationContext(), "List Fetched!", Toast.LENGTH_SHORT).show();
                     Logger.v("Response: " + response.toString())
-                    tapriMenuResponce = Gson().fromJson<TapriMenuResponce>(response.toString(), TapriMenuResponce::class.java!!)
+                    hubsItemPojo = Gson().fromJson<HubItemsPojo>(response.toString(), HubItemsPojo::class.java::class.java)
                     if (tapriMenuResponce != null) {
-                        setItems(tapriMenuResponce!!.getData())
+                        setItems(hubsItemPojo!!.data)
                     }
                 },
                 Response.ErrorListener { error ->
@@ -351,7 +369,7 @@ class NewStockActivity : AppCompatActivity() {
             override fun getHeaders(): Map<String, String> {
                 val params = HashMap<String, String>()
                 params["Content-Type"] = "application/json"
-                params["token"] = preferenceManager!!.getAccessToken()
+                params["token"] = preferenceManager!!.accessToken
                 return params
             }
 
@@ -365,57 +383,57 @@ class NewStockActivity : AppCompatActivity() {
         queue!!.add(getRequest)
     }
 
-    private fun setItems(data: TapriMenuResponce.Data) {
+    private fun setItems(data: HubItemsPojo.Data) {
 
         setListVisiblity(data)
 
 
-        mBeveragesAdapter = ItemsListAdapter(this, data.getBeverages(), object : ItemSelectionCallback() {
-            fun onitemAdded(cost: Double?, quant: Int) {
+        mBeveragesAdapter = ItemsListAdapter(this, data.beverages, object : ItemSelectionCallback {
+            override fun onitemAdded(cost: Double?, quant: Int) {
                 mTotalCost = mTotalCost!! + cost!! * quant
                 updateTotalCostUI()
             }
 
-            fun onItemRemoved(cost: Double?, quant: Int) {
+            override fun onItemRemoved(cost: Double?, quant: Int) {
                 mTotalCost = mTotalCost!! - cost!! * quant
                 updateTotalCostUI()
 
             }
         })
-        mExtrasAdapter = ItemsListAdapter(this, data.getExtra(), object : ItemSelectionCallback() {
-            fun onitemAdded(cost: Double?, quant: Int) {
+        mExtrasAdapter = ItemsListAdapter(this, data.extra, object : ItemSelectionCallback {
+            override fun onitemAdded(cost: Double?, quant: Int) {
                 mTotalCost = mTotalCost!! + cost!! * quant
                 updateTotalCostUI()
 
             }
 
-            fun onItemRemoved(cost: Double?, quant: Int) {
+            override fun onItemRemoved(cost: Double?, quant: Int) {
                 mTotalCost = mTotalCost!! - cost!! * quant
                 updateTotalCostUI()
 
             }
         })
-        mSnacksAdapter = ItemsListAdapter(this, data.getSnacks(), object : ItemSelectionCallback() {
-            fun onitemAdded(cost: Double?, quant: Int) {
+        mSnacksAdapter = ItemsListAdapter(this, data.snacks, object : ItemSelectionCallback {
+            override fun onitemAdded(cost: Double?, quant: Int) {
                 mTotalCost = mTotalCost!! + cost!! * quant
                 updateTotalCostUI()
 
             }
 
-            fun onItemRemoved(cost: Double?, quant: Int) {
+            override fun onItemRemoved(cost: Double?, quant: Int) {
                 mTotalCost = mTotalCost!! - cost!! * quant
                 updateTotalCostUI()
 
             }
         })
-        mChahiyehAdapter = ItemsListAdapter(this, data.getChaihiyeh(), object : ItemSelectionCallback() {
-            fun onitemAdded(cost: Double?, quant: Int) {
+        mChahiyehAdapter = ItemsListAdapter(this, data.chaihiyeh, object : ItemSelectionCallback {
+            override fun onitemAdded(cost: Double?, quant: Int) {
                 mTotalCost = mTotalCost!! + cost!! * quant
                 updateTotalCostUI()
 
             }
 
-            fun onItemRemoved(cost: Double?, quant: Int) {
+            override fun onItemRemoved(cost: Double?, quant: Int) {
                 mTotalCost = mTotalCost!! - cost!! * quant
                 updateTotalCostUI()
 
@@ -440,40 +458,29 @@ class NewStockActivity : AppCompatActivity() {
 
     }
 
-    private fun updateTotalCostUI() {
-        mPaymentHeader!!.text = "Payment : ₹" + mTotalCost!!
-        if (mTotalCost > mAvailableBalance) {
-            mAddMoney!!.background = ContextCompat.getDrawable(applicationContext, R.drawable.button_light_selector)
-            mMoneyTobeAdded = mTotalCost!! - mAvailableBalance!!
-            mAddMoney!!.text = "Add ₹" + (mTotalCost!! - mAvailableBalance!!)
-        } else {
-            mAddMoney!!.background = ContextCompat.getDrawable(applicationContext, R.drawable.background_white)
-            mMoneyTobeAdded = 0.0
-            mAddMoney!!.text = "Add Money!"
-        }
-    }
 
-    private fun setListVisiblity(data: HubMenuResponce.Data) {
 
-        mBeveragesll!!.setVisibility(View.VISIBLE)
+    private fun setListVisiblity(data: HubItemsPojo.Data) {
+
+        mBeveragesll!!.visibility = View.VISIBLE
         mChaihiyehll!!.visibility = View.VISIBLE
-        mSnacksll!!.setVisibility(View.VISIBLE)
-        mExtrasll!!.setVisibility(View.VISIBLE)
+        mSnacksll!!.visibility = View.VISIBLE
+        mExtrasll!!.visibility = View.VISIBLE
         var nocheck = false
-        if (data.getBeverages().length === 0) {
-            mBeveragesll!!.setVisibility(View.GONE)
+        if (data.beverages.isEmpty()) {
+            mBeveragesll!!.visibility = View.GONE
             nocheck = true
         }
-        if (data.getChaihiyeh().length === 0) {
+        if (data.chaihiyeh.isEmpty()) {
             mChaihiyehll!!.visibility = View.GONE
             nocheck = true
         }
-        if (data.getExtra().length === 0) {
-            mExtrasll!!.setVisibility(View.GONE)
+        if (data.extra.isEmpty()) {
+            mExtrasll!!.visibility = View.GONE
             nocheck = true
         }
-        if (data.getSnacks().length === 0) {
-            mSnacksll!!.setVisibility(View.GONE)
+        if (data.snacks.isEmpty()) {
+            mSnacksll!!.visibility = View.GONE
             nocheck = true
         }
         if (!nocheck) {
@@ -492,16 +499,16 @@ class NewStockActivity : AppCompatActivity() {
                 Toast.makeText(applicationContext, "Address Selected!", Toast.LENGTH_SHORT).show()
 
                 address = intent.getSerializableExtra("address") as UserAddress.Data
-                val fulladdressstring = (address!!.getLandmark() + ", "
-                        + address!!.getFlatSociety() + ", "
-                        + address!!.getAddressLine1() + ", "
-                        + address!!.getAddressLine2() + ", "
-                        + address!!.getCity() + ", "
-                        + address!!.getCountry())
+                val fulladdressstring = (address!!.landmark + ", "
+                        + address!!.flatSociety + ", "
+                        + address!!.addressLine1 + ", "
+                        + address!!.addressLine2 + ", "
+                        + address!!.city + ", "
+                        + address!!.country)
 
-                mAddressFull!!.setText(fulladdressstring)
-                mAddressNick!!.setText(address!!.getNickname())
-                preferenceManager!!.setDefaultAddress(gson!!.toJson(address))
+                mAddressFull!!.text = fulladdressstring
+                mAddressNick!!.text = address!!.nickname
+                preferenceManager!!.setHubAddress(gson!!.toJson(address))
                 mAddressInclude!!.visibility = View.VISIBLE
                 mAddressInclude!!.background = ContextCompat.getDrawable(applicationContext, R.color.colorHighlight)
                 Logger.v("selected address is: $fulladdressstring")
@@ -511,6 +518,10 @@ class NewStockActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    private fun updateTotalCostUI() {
+        proceedtopay.text = "Pay: ₹$mTotalCost"
     }
 
 

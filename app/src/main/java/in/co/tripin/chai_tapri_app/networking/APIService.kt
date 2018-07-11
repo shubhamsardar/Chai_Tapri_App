@@ -35,6 +35,9 @@ public interface APIService {
     @GET("v2/tapri/orders?type=pending")
     abstract fun getPendingOrders(@Header("token")  token :String): Observable<PendingOrdersResponce>
 
+    @GET("v1/tapri/hub")
+    abstract fun getHubDetails(@Header("token")  token :String): Observable<MappedHubResponce>
+
 
     @POST("v1/user/password/update")
     abstract fun changePIN(@Header("token")  token :String,

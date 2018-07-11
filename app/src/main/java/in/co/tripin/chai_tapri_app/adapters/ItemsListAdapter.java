@@ -14,16 +14,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 
+import in.co.tripin.chai_tapri_app.Managers.Logger;
+import in.co.tripin.chai_tapri_app.POJOs.Responces.HubItemsPojo;
 import in.co.tripin.chai_tapri_app.POJOs.Responces.HubMenuResponce;
 import in.co.tripin.chai_tapri_app.R;
 
 public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListAdapter.ViewHolder> {
 
-    public HubMenuResponce.Data.Item[] data;
+    public HubItemsPojo.Data.Item[] data;
     public Context context;
     public ItemSelectionCallback itemSelectionCallback;
 
-    public ItemsListAdapter(Context context, HubMenuResponce.Data.Item[] data, ItemSelectionCallback itemSelectionCallback) {
+    public ItemsListAdapter(Context context, HubItemsPojo.Data.Item[] data, ItemSelectionCallback itemSelectionCallback) {
         this.data = data;
         this.context = context;
         this.itemSelectionCallback = itemSelectionCallback;
@@ -53,7 +55,7 @@ public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListAdapter.View
         }else {
             holder.display.setBackground(ContextCompat.getDrawable(context,R.drawable.brown_border_bg));
             holder.display.setTextColor(ContextCompat.getColor(context,R.color.colorAccent));
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(context,R.color.transparent));
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(context,R.color.colorGreyLight));
 
         }
 
@@ -89,7 +91,7 @@ public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListAdapter.View
                 }else {
                     holder.display.setBackground(ContextCompat.getDrawable(context,R.drawable.brown_border_bg));
                     holder.display.setTextColor(ContextCompat.getColor(context,R.color.colorAccent));
-                    holder.itemView.setBackgroundColor(ContextCompat.getColor(context,R.color.transparent));
+                    holder.itemView.setBackgroundColor(ContextCompat.getColor(context,R.color.colorGreyLight));
                 }
 
                 Logger.v("Quantity OnTextChanged: " + data[position].getQuantity());

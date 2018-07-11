@@ -15,6 +15,10 @@ public class PreferenceManager {
     private static final String PREF_FCM_ID = "user_fcm_id";
     private static final String PREF_TAPRI_NAME = "tapri_name";
     private static final String PREF_FILE_NAME = "file_name";
+    private static final String PREF_HUB_ADDRESS = "hub_address";
+    private static final String PREF_HUB_AID = "hub_id";
+
+
 
 
     private static SharedPreferences sInstance;
@@ -72,6 +76,39 @@ public class PreferenceManager {
         editor.putString(PREF_ACCESS_TOKEN, accessToken);
         editor.commit();
     }
+
+    /**
+     * @return
+     */
+    public String getHubAddress() {
+        String accessToken = sInstance.getString(PREF_HUB_ADDRESS, null);
+        return accessToken;
+    }
+
+    /**
+     * @param accessToken
+     */
+    public void setHubAddress(String accessToken) {
+        editor.putString(PREF_HUB_ADDRESS, accessToken);
+        editor.commit();
+    }
+
+    /**
+     * @return
+     */
+    public String getHubAId() {
+        String accessToken = sInstance.getString(PREF_HUB_AID, null);
+        return accessToken;
+    }
+
+    /**
+     * @param id
+     */
+    public void setHubId(String id) {
+        editor.putString(PREF_HUB_AID, id);
+        editor.commit();
+    }
+
 
     /**
      * @return
