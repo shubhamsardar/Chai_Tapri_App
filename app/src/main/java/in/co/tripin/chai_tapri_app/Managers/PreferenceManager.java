@@ -8,7 +8,7 @@ public class PreferenceManager {
 
     public static final String PREF_MOBILE_NUMBER = "registered_mobile_no";
     public static final String PREF_USER_NAME = "user_name";
-    public static final String PREF_TAPRI_ID = "tripri_id";
+    public static final String PREF_TAPRI_ID = "tapri_id";
     public static final String PREF_LOGIN_STATUS = "login_status";
     private static final String PREF_ACCESS_TOKEN = "partner_access_token";
     private static final String PREF_USER_ID = "partner_user_id";
@@ -157,12 +157,12 @@ public class PreferenceManager {
         editor.commit();
     }
 
-    public String getTripinId() {
-        String tripinId = sInstance.getString(PREF_TAPRI_ID, null);
-        return tripinId;
+    public String getTapriId() {
+        String tapriId = sInstance.getString(PREF_TAPRI_ID, null);
+        return tapriId;
     }
 
-    public void setTripinId(String tripinId) {
+    public void setTapriId(String tripinId) {
         editor.putString(PREF_TAPRI_ID, tripinId);
         editor.commit();
     }

@@ -51,11 +51,10 @@ public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListAdapter.View
         if(data[position].getQuantity()!=0){
             holder.display.setBackgroundColor(ContextCompat.getColor(context,R.color.colorAccent));
             holder.display.setTextColor(ContextCompat.getColor(context,R.color.black));
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(context,R.color.colorHighlight));
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(context,R.color.colorGreyLight));
         }else {
             holder.display.setBackground(ContextCompat.getDrawable(context,R.drawable.brown_border_bg));
             holder.display.setTextColor(ContextCompat.getColor(context,R.color.colorAccent));
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(context,R.color.colorGreyLight));
 
         }
 
@@ -87,11 +86,10 @@ public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListAdapter.View
                 if(data[position].getQuantity()!=0){
                     holder.display.setBackgroundColor(ContextCompat.getColor(context,R.color.colorAccent));
                     holder.display.setTextColor(ContextCompat.getColor(context,R.color.black));
-                    holder.itemView.setBackgroundColor(ContextCompat.getColor(context,R.color.colorHighlight));
+                    holder.itemView.setBackgroundColor(ContextCompat.getColor(context,R.color.colorGreyLight));
                 }else {
                     holder.display.setBackground(ContextCompat.getDrawable(context,R.drawable.brown_border_bg));
                     holder.display.setTextColor(ContextCompat.getColor(context,R.color.colorAccent));
-                    holder.itemView.setBackgroundColor(ContextCompat.getColor(context,R.color.colorGreyLight));
                 }
 
                 Logger.v("Quantity OnTextChanged: " + data[position].getQuantity());

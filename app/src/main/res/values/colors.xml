@@ -6,8 +6,14 @@
 
     <color name="colorHighlight">#998166</color>
     <color name="colorGrey">#efe9e5</color>
+    <color name="colorGreyWhite">#edecea</color>
+
     <color name="colorGreyLight">#f1e4dc</color>
     <color name="black">#000000</color>
+    <color name="green">#91a766</color>
+    <color name="blue">#5eaf9a</color>
+
+
 
 
 </resources>

@@ -54,7 +54,7 @@
                         android:layout_marginTop="16dp"
                         android:drawableLeft="@drawable/ic_arrow_drop_up_black_24dp"
                         android:drawableStart="@drawable/ic_arrow_drop_up_black_24dp"
-                        android:fontFamily="@font/source_sans_pro_semibold"
+                        android:fontFamily="@font/rajdhani_bold"
                         android:gravity="center_vertical"
                         android:text="Items Selected"
                         android:textAllCaps="true"
@@ -78,7 +78,8 @@
                         android:fontFamily="@font/rajdhani_bold"
                         android:gravity="center_vertical|center_horizontal"
                         android:text="No Items Available!"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:visibility="gone" />
 
                     <LinearLayout
                         android:id="@+id/chaihiyehll"
@@ -277,7 +278,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/button_main_selector"
         android:elevation="2dp"
-        android:fontFamily="@font/source_sans_pro_semibold"
+        android:fontFamily="@font/rajdhani_bold"
         android:gravity="center"
         android:padding="16dp"
         android:text="Proceed To Order Summery"

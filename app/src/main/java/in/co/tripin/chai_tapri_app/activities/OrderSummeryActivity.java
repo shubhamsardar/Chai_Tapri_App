@@ -125,7 +125,7 @@ public class OrderSummeryActivity extends AppCompatActivity {
 
         final JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("tapriId",orderSummeryPOJO.getmTapriId());
+            jsonObject.put("hubId",orderSummeryPOJO.getmTapriId());
             jsonObject.put("paymentType",orderSummeryPOJO.getmPaymentMethod());
             jsonObject.put("totalAmount", Double.parseDouble(orderSummeryPOJO.getmTotalCost()));
             JSONArray jsonArray = new JSONArray();
@@ -138,7 +138,7 @@ public class OrderSummeryActivity extends AppCompatActivity {
                 jsonArray.put(jsonObject1);
             }
             jsonObject.put("details",jsonArray);
-            jsonObject.put("addressId",orderSummeryPOJO.getmAddress().get_id());
+            jsonObject.put("addressId",orderSummeryPOJO.getmHubAddressId());
 
             Logger.v("Body :"+jsonObject.toString());
             apiCall(jsonObject);
@@ -155,7 +155,7 @@ public class OrderSummeryActivity extends AppCompatActivity {
     private void apiCall(final JSONObject jsonObject) {
 
 
-        final String url = "http://139.59.70.142:3055/api/v2/initiateOrder";
+        final String url = "http://192.168.1.21:3055/api/v2/initiateOrder";
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.POST, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -163,7 +163,7 @@ public class OrderSummeryActivity extends AppCompatActivity {
                         // display response
                         Logger.v("Response: "+ response.toString());
                         Toast.makeText(getApplicationContext(),"Order Placed Successfully!", Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(OrderSummeryActivity.this,OrderHistoryActivity.class);
+                        Intent intent = new Intent(OrderSummeryActivity.this,StockHistoryActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                         finish();

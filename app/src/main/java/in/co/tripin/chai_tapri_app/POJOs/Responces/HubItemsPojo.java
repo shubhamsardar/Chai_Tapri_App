@@ -1,6 +1,8 @@
 package in.co.tripin.chai_tapri_app.POJOs.Responces;
 
-public class HubItemsPojo {
+import java.io.Serializable;
+
+public class HubItemsPojo implements Serializable {
     private String status;
 
     private Data data;
@@ -31,7 +33,7 @@ public class HubItemsPojo {
         return "ClassPojo [status = "+status+", data = "+data+"]";
     }
 
-    public class Data
+    public class Data implements Serializable
     {
         private Item[] Chaihiyeh;
 
@@ -87,7 +89,7 @@ public class HubItemsPojo {
             return "ClassPojo [Chaihiyeh = "+Chaihiyeh+", Extra = "+Extra+", Beverages = "+Beverages+", Snacks = "+Snacks+"]";
         }
 
-        public class Item
+        public class Item implements Serializable
         {
             private String category;
 

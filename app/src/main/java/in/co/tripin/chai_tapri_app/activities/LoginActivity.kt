@@ -117,6 +117,7 @@ class LoginActivity : AppCompatActivity() {
                 for(role: LogInResponce.Data.Role in loginResponce.data.roles){
                     if(role.roleType == "10016"){
                         isRole = true
+                        preferenceManager.tapriId = role.id
                     }
                 }
 

@@ -70,12 +70,12 @@ class OrderHistoryActivity : AppCompatActivity() {
 
         Logger.v("fetch List of Order History..")
         dialog!!.show()
-        val url = "http://139.59.70.142:3055/api/v2/users/orders"
+        val url = "http://192.168.1.21:3055/api/v2/tapri/orders"
         val getRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 Response.Listener<JSONObject> { response ->
                     // display response
                     Log.d("Response", response.toString())
-                    orderHistoryResponce = gson!!.fromJson<OrderHistoryResponce>(response.toString(), OrderHistoryResponce::class.java!!)
+                    orderHistoryResponce = gson!!.fromJson(response.toString(), OrderHistoryResponce::class.java)
                     if (orderHistoryResponce != null) {
                         setAdapter(orderHistoryResponce!!.data)
                         dialog!!.dismiss()
@@ -90,7 +90,7 @@ class OrderHistoryActivity : AppCompatActivity() {
                 },
                 Response.ErrorListener { error ->
                     dialog!!.dismiss()
-                    Logger.d("Error.Response: " + error.toString())
+                    Logger.v("Error.Response: " + error.toString())
                     Toast.makeText(applicationContext, "Server Error", Toast.LENGTH_SHORT).show()
                 }
         ) {

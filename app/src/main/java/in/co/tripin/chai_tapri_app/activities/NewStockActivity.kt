@@ -53,7 +53,8 @@ class NewStockActivity : AppCompatActivity() {
 
 
 
-    private var tapriId: String? = ""
+    private var hubId: String? = ""
+    private var hubAddressId: String? = ""
     private var tapriName: String? = ""
     private var address: UserAddress.Data? = null
     private var queue: RequestQueue? = null
@@ -147,6 +148,12 @@ class NewStockActivity : AppCompatActivity() {
             hubsData = responce
             preferenceManager.hubAddress = gson!!.toJson(responce.data.address)
             hitHubtemsListAPI(responce.data.hubId)
+            setAddress()
+            mAddressNick!!.text = hubsData.data.name.toString().toUpperCase()
+            tapriName = hubsData.data.name.toString()
+            hubId = hubsData.data.hubId
+            hubAddressId = hubsData.data.address.id
+            proceedtopay.visibility = View.INVISIBLE
         }else{
             Toast.makeText(applicationContext,"Error!",Toast.LENGTH_SHORT).show()
         }
@@ -251,12 +258,12 @@ class NewStockActivity : AppCompatActivity() {
                 val paymentMethod = "COD"
 
 
-                val orderSummeryPOJO = OrderSummeryPOJO(tapriId,
+                val orderSummeryPOJO = OrderSummeryPOJO(hubId,
                         tapriName,
                         java.lang.Double.toString(cost),
                         address,
                         paymentMethod,
-                        mItems)
+                        mItems,hubAddressId)
 
                 if (!orderSummeryPOJO.getmItems().isEmpty()) {
 
@@ -329,8 +336,12 @@ class NewStockActivity : AppCompatActivity() {
         val mLayoutManager3 = LinearLayoutManager(applicationContext)
         mChaihiyehList!!.layoutManager = mLayoutManager3
 
-        preferenceManager = PreferenceManager.getInstance(this)
 
+
+
+    }
+
+    fun setAddress(){
         mAddressCancel!!.visibility = View.GONE
         if (preferenceManager!!.getHubAddress() == null) {
             mAddressInclude!!.visibility = View.GONE
@@ -340,27 +351,27 @@ class NewStockActivity : AppCompatActivity() {
             mAddressFull!!.text = address!!.fullAddressString
 
         }
-
     }
 
     private fun hitHubtemsListAPI(hubId : String) {
 
         Logger.v("getting menu...")
         dialog!!.show()
-        val url = "http://192.168.1.21:3055/api/v1/hub/$hubId/items"
+        val url = "http://192.168.1.21:3055/api/v1/hub/$hubId/items/active"
 
         val getRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 Response.Listener { response ->
                     // display response
                     //Toast.makeText(getApplicationContext(), "List Fetched!", Toast.LENGTH_SHORT).show();
                     Logger.v("Response: " + response.toString())
-                    hubsItemPojo = Gson().fromJson<HubItemsPojo>(response.toString(), HubItemsPojo::class.java::class.java)
-                    if (tapriMenuResponce != null) {
-                        setItems(hubsItemPojo!!.data)
-                    }
+
+                    //val dummyres = ""
+                    hubsItemPojo = Gson().fromJson(response.toString(), HubItemsPojo::class.java)
+                    setItems(hubsItemPojo!!.data)
+                    proceedtopay.visibility = View.VISIBLE
                 },
                 Response.ErrorListener { error ->
-                    Logger.v("Error.Response: " + error.toString())
+                    Logger.v("Error.Response: " + error.message.toString())
                     Toast.makeText(applicationContext, "Server Error", Toast.LENGTH_SHORT).show()
                     dialog!!.dismiss()
                 }
@@ -462,66 +473,66 @@ class NewStockActivity : AppCompatActivity() {
 
     private fun setListVisiblity(data: HubItemsPojo.Data) {
 
-        mBeveragesll!!.visibility = View.VISIBLE
-        mChaihiyehll!!.visibility = View.VISIBLE
-        mSnacksll!!.visibility = View.VISIBLE
-        mExtrasll!!.visibility = View.VISIBLE
-        var nocheck = false
-        if (data.beverages.isEmpty()) {
-            mBeveragesll!!.visibility = View.GONE
-            nocheck = true
+        mBeveragesll!!.visibility = View.GONE
+        mChaihiyehll!!.visibility = View.GONE
+        mSnacksll!!.visibility = View.GONE
+        mExtrasll!!.visibility = View.GONE
+        var isNoItemsTexttobeHidden = true
+        if (!data.beverages.isEmpty()) {
+            mBeveragesll!!.visibility = View.VISIBLE
+            isNoItemsTexttobeHidden = false
         }
-        if (data.chaihiyeh.isEmpty()) {
-            mChaihiyehll!!.visibility = View.GONE
-            nocheck = true
+        if (!data.chaihiyeh.isEmpty()) {
+            mChaihiyehll!!.visibility = View.VISIBLE
+            isNoItemsTexttobeHidden = false
         }
-        if (data.extra.isEmpty()) {
-            mExtrasll!!.visibility = View.GONE
-            nocheck = true
+        if (!data.extra.isEmpty()) {
+            mExtrasll!!.visibility = View.VISIBLE
+            isNoItemsTexttobeHidden = false
         }
-        if (data.snacks.isEmpty()) {
-            mSnacksll!!.visibility = View.GONE
-            nocheck = true
+        if (!data.snacks.isEmpty()) {
+            mSnacksll!!.visibility = View.VISIBLE
+            isNoItemsTexttobeHidden = false
         }
-        if (!nocheck) {
+        if (isNoItemsTexttobeHidden) {
             mNoItems!!.visibility = View.GONE
         }
     }
 
-    // Call Back method  to get the Message form other Activity
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent) {
-        super.onActivityResult(requestCode, resultCode, intent)
-
-        Logger.v("On Activity Result : result code: $resultCode request code:$requestCode")
-
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == 1) {
-                Toast.makeText(applicationContext, "Address Selected!", Toast.LENGTH_SHORT).show()
-
-                address = intent.getSerializableExtra("address") as UserAddress.Data
-                val fulladdressstring = (address!!.landmark + ", "
-                        + address!!.flatSociety + ", "
-                        + address!!.addressLine1 + ", "
-                        + address!!.addressLine2 + ", "
-                        + address!!.city + ", "
-                        + address!!.country)
-
-                mAddressFull!!.text = fulladdressstring
-                mAddressNick!!.text = address!!.nickname
-                preferenceManager!!.setHubAddress(gson!!.toJson(address))
-                mAddressInclude!!.visibility = View.VISIBLE
-                mAddressInclude!!.background = ContextCompat.getDrawable(applicationContext, R.color.colorHighlight)
-                Logger.v("selected address is: $fulladdressstring")
-            }
-        } else {
-            Toast.makeText(applicationContext, "Address not selected!", Toast.LENGTH_SHORT).show()
-        }
-
-
-    }
+//    // Call Back method  to get the Message form other Activity
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent) {
+//        super.onActivityResult(requestCode, resultCode, intent)
+//
+//        Logger.v("On Activity Result : result code: $resultCode request code:$requestCode")
+//
+//        if (resultCode == Activity.RESULT_OK) {
+//            if (requestCode == 1) {
+//                Toast.makeText(applicationContext, "Address Selected!", Toast.LENGTH_SHORT).show()
+//
+//                address = intent.getSerializableExtra("address") as UserAddress.Data
+//                val fulladdressstring = (address!!.landmark + ", "
+//                        + address!!.flatSociety + ", "
+//                        + address!!.addressLine1 + ", "
+//                        + address!!.addressLine2 + ", "
+//                        + address!!.city + ", "
+//                        + address!!.country)
+//
+//                mAddressFull!!.text = fulladdressstring
+//                mAddressNick!!.text = address!!.nickname
+//                preferenceManager!!.setHubAddress(gson!!.toJson(address))
+//                mAddressInclude!!.visibility = View.VISIBLE
+//                mAddressInclude!!.background = ContextCompat.getDrawable(applicationContext, R.color.colorHighlight)
+//                Logger.v("selected address is: $fulladdressstring")
+//            }
+//        } else {
+//            Toast.makeText(applicationContext, "Address not selected!", Toast.LENGTH_SHORT).show()
+//        }
+//
+//
+//    }
 
     private fun updateTotalCostUI() {
-        proceedtopay.text = "Pay: ₹$mTotalCost"
+        proceedtopay.text = "Proceed: ₹$mTotalCost"
     }
 
 

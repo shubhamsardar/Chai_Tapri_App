@@ -22,6 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:drawableLeft="@drawable/ic_arrow_drop_down_black_24dp"
             android:fontFamily="@font/rajdhani_bold"
             android:gravity="center_vertical"
             android:text="#HHJJAARR"
@@ -34,9 +35,21 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="@font/rajdhani_bold"
-            android:gravity="right|center_vertical"
+            android:gravity="center_vertical"
             android:text="20 June, 2018"
             android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/orderstatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/rajdhani_bold"
+            android:gravity="right|center_vertical"
+            android:text="Status"
+            android:textColor="@android:color/background_dark"
+            android:textStyle="bold" />
+
 
     </LinearLayout>
 
@@ -83,8 +96,8 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="3dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:layout_marginTop="3dp"
             android:alpha="0.3"
             android:background="@android:color/background_dark" />
@@ -103,7 +116,7 @@
                 android:layout_weight="1"
                 android:fontFamily="@font/rajdhani_bold"
                 android:text="Total Cost"
-                android:textColor="@color/colorPrimary" />
+                android:textColor="@color/colorHighlight" />
 
             <TextView
                 android:id="@+id/totalcost"
@@ -132,7 +145,7 @@
                 android:layout_margin="5dp"
                 android:fontFamily="@font/rajdhani_bold"
                 android:paddingTop="10dp"
-                android:text="DELIVER TO"
+                android:text="PICK UP FROM"
                 android:textColor="@android:color/background_dark"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -186,11 +199,25 @@
                 android:text="COD"
                 android:textSize="12sp" />
 
+            <TextView
+                android:id="@+id/markRecieved"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:background="@drawable/button_blue_selector"
+                android:fontFamily="@font/rajdhani_bold"
+                android:padding="8dp"
+                android:layout_gravity="right"
+                android:gravity="center"
+                android:drawableLeft="@drawable/ic_done_black_24dp"
+                android:text="Mark Recieved"
+                android:textColor="@android:color/background_light" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:padding="5dp">
+                android:padding="5dp"
+                android:visibility="gone">
 
                 <Button
                     android:id="@+id/b1"
@@ -208,6 +235,7 @@
                     android:fontFamily="@font/rajdhani_bold"
                     android:text="Accept" />
             </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>

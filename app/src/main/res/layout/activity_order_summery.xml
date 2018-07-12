@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="5dp"
     tools:context=".activities.OrderSummeryActivity">
 
     <TextView
@@ -12,11 +13,11 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@drawable/button_main_selector"
-        android:fontFamily="@font/source_sans_pro_semibold"
+        android:fontFamily="@font/rajdhani_bold"
         android:gravity="center_horizontal"
         android:padding="16dp"
-        android:text="PCODEED TO PAY"
-        android:textColor="@color/colorPrimaryDark"
+        android:text="PLACE ORDER!"
+        android:textColor="@android:color/background_light"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -37,7 +38,7 @@
                 android:id="@+id/tv_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorHighlight"
+                android:background="@color/colorGrey"
                 android:fontFamily="@font/source_sans_pro_extralight"
                 android:gravity="center_horizontal"
                 android:padding="16dp"
@@ -96,8 +97,9 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/rajdhani_bold"
                     android:text="Total Cost"
-                    android:textColor="@color/colorAccent" />
+                    android:textColor="@color/colorPrimary" />
 
                 <TextView
                     android:id="@+id/totalcost"
@@ -116,7 +118,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@color/colorHighlight"
+                android:background="@color/colorGrey"
                 android:elevation="2dp"
                 android:orientation="vertical"
                 android:padding="5dp">
@@ -128,7 +130,7 @@
                     android:layout_margin="5dp"
                     android:fontFamily="@font/rajdhani_bold"
                     android:paddingTop="10dp"
-                    android:text="DELIVER TO"
+                    android:text="PICKUP FROM"
                     android:textColor="@color/black"
                     android:textStyle="bold" />
 

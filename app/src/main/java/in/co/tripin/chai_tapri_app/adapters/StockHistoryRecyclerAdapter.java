@@ -2,12 +2,10 @@ package in.co.tripin.chai_tapri_app.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -16,12 +14,12 @@ import in.co.tripin.chai_tapri_app.POJOs.Responces.OrderHistoryResponce;
 import in.co.tripin.chai_tapri_app.R;
 
 
-public class OrderHistoryRecyclerAdapter extends RecyclerView.Adapter<OrderHistoryRecyclerAdapter.ViewHolder> {
+public class StockHistoryRecyclerAdapter extends RecyclerView.Adapter<StockHistoryRecyclerAdapter.ViewHolder> {
 
     public OrderHistoryResponce.Data[] data;
     public Context context;
 
-    public OrderHistoryRecyclerAdapter(Context context, OrderHistoryResponce.Data[] data) {
+    public StockHistoryRecyclerAdapter(Context context, OrderHistoryResponce.Data[] data) {
         this.data = data;
         this.context = context;
     }
@@ -30,8 +28,8 @@ public class OrderHistoryRecyclerAdapter extends RecyclerView.Adapter<OrderHisto
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_order_history, parent, false);
-        return new OrderHistoryRecyclerAdapter.ViewHolder(itemView);
+                .inflate(R.layout.item_stock_history, parent, false);
+        return new StockHistoryRecyclerAdapter.ViewHolder(itemView);
     }
 
     @Override

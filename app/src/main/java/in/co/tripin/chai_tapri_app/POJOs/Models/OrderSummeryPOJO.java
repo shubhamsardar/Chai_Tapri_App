@@ -9,19 +9,36 @@ import in.co.tripin.chai_tapri_app.POJOs.Responces.HubMenuResponce;
 public class OrderSummeryPOJO implements Serializable {
 
     private String mTapriId;
+    private String mHubAddressId;
     private String mTapriName;
     private String mTotalCost;
     private UserAddress.Data mAddress;
     private String mPaymentMethod;
     private ArrayList<HubItemsPojo.Data.Item> mItems;
 
-    public OrderSummeryPOJO(String mTapriId, String mTapriName, String mTotalCost, UserAddress.Data mAddress, String mPaymentMethod, ArrayList<HubItemsPojo.Data.Item> mItems) {
+    public OrderSummeryPOJO(String mTapriId,
+                            String mTapriName,
+                            String mTotalCost,
+                            UserAddress.Data mAddress,
+                            String mPaymentMethod,
+                            ArrayList<HubItemsPojo.Data.Item> mItems,
+                            String mHubAddressId
+                            ) {
         this.mTapriId = mTapriId;
         this.mTapriName = mTapriName;
         this.mTotalCost = mTotalCost;
         this.mAddress = mAddress;
         this.mPaymentMethod = mPaymentMethod;
         this.mItems = mItems;
+        this.mHubAddressId = mHubAddressId;
+    }
+
+    public String getmHubAddressId() {
+        return mHubAddressId;
+    }
+
+    public void setmHubAddressId(String mHubAddressId) {
+        this.mHubAddressId = mHubAddressId;
     }
 
     public String getmPaymentMethod() {
