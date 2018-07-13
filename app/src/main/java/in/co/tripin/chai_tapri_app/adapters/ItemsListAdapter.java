@@ -15,17 +15,18 @@ import android.widget.TextView;
 
 
 import in.co.tripin.chai_tapri_app.Managers.Logger;
+import in.co.tripin.chai_tapri_app.POJOs.Models.Item;
 import in.co.tripin.chai_tapri_app.POJOs.Responces.HubItemsPojo;
 import in.co.tripin.chai_tapri_app.POJOs.Responces.HubMenuResponce;
 import in.co.tripin.chai_tapri_app.R;
 
 public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListAdapter.ViewHolder> {
 
-    public HubItemsPojo.Data.Item[] data;
+    public Item[] data;
     public Context context;
     public ItemSelectionCallback itemSelectionCallback;
 
-    public ItemsListAdapter(Context context, HubItemsPojo.Data.Item[] data, ItemSelectionCallback itemSelectionCallback) {
+    public ItemsListAdapter(Context context, Item[] data, ItemSelectionCallback itemSelectionCallback) {
         this.data = data;
         this.context = context;
         this.itemSelectionCallback = itemSelectionCallback;

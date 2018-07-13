@@ -9,8 +9,10 @@ import `in`.co.tripin.chai_tapri_app.R
 import `in`.co.tripin.chai_tapri_app.adapters.PendingAdapter
 import `in`.co.tripin.chai_tapri_app.adapters.PendingOrdersInteractionCallback
 import `in`.co.tripin.chai_tapri_app.networking.APIService
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
@@ -205,9 +207,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         callEditOrderAPI(mOrderId,"sent")
     }
 
+    @SuppressLint("MissingPermission")
     override fun onCalledCustomer(mMobile: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+        //call to admin
+        val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$mMobile"))
+        startActivity(intent)    }
 
     private fun callEditOrderAPI(mOrderId: String?, mOperation :String) {
 

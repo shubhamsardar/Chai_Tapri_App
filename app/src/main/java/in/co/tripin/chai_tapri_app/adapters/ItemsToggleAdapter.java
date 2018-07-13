@@ -16,19 +16,20 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import in.co.tripin.chai_tapri_app.Managers.Logger;
+import in.co.tripin.chai_tapri_app.POJOs.Models.Item;
 import in.co.tripin.chai_tapri_app.POJOs.Responces.HubItemsPojo;
 import in.co.tripin.chai_tapri_app.R;
 
 public class ItemsToggleAdapter extends RecyclerView.Adapter<ItemsToggleAdapter.ViewHolder> {
 
-    public HubItemsPojo.Data.Item[] data;
+    public Item[] data;
     public Context context;
-    public ItemSelectionCallback itemSelectionCallback;
+    public ItemToggleCallback itemToggleCallback;
 
-    public ItemsToggleAdapter(Context context, HubItemsPojo.Data.Item[] data, ItemSelectionCallback itemSelectionCallback) {
+    public ItemsToggleAdapter(Context context, Item[] data, ItemToggleCallback itemToggleCallback) {
         this.data = data;
         this.context = context;
-        this.itemSelectionCallback = itemSelectionCallback;
+        this.itemToggleCallback = itemToggleCallback;
     }
 
     @NonNull
@@ -44,16 +45,40 @@ public class ItemsToggleAdapter extends RecyclerView.Adapter<ItemsToggleAdapter.
 
         holder.itemName.setText(data[position].getName());
         holder.itemRate.setText("₹" + data[position].getRate());
+        if(data[position].getCategory().equals("Chaihiyeh")){
+            //check flag
+            if(data[position].getFlag().equals("1")){
+                holder.toggle.setChecked(true);
+                holder.itemView.setBackgroundColor(ContextCompat.getColor(context,R.color.colorGreyLight));
+            }else {
+                holder.toggle.setChecked(false);
+            }
+
+        }else {
+            //check status
+            if(data[position].getStatus().equals("1")){
+                holder.toggle.setChecked(true);
+                holder.itemView.setBackgroundColor(ContextCompat.getColor(context,R.color.colorGreyLight));
+            }else {
+                holder.toggle.setChecked(false);
+            }
+
+        }
         holder.toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if(b){
                     holder.itemView.setBackgroundColor(ContextCompat.getColor(context,R.color.colorGreyLight));
+                    itemToggleCallback.onItemInactive(data[position].get_id());
+
                 }else {
                     holder.itemView.setBackgroundColor(ContextCompat.getColor(context,R.color.colorGreyWhite));
+                    itemToggleCallback.onitemActive(data[position].get_id());
                 }
             }
         });
+
+
 
     }
 

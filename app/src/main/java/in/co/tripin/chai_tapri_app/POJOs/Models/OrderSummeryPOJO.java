@@ -14,14 +14,14 @@ public class OrderSummeryPOJO implements Serializable {
     private String mTotalCost;
     private UserAddress.Data mAddress;
     private String mPaymentMethod;
-    private ArrayList<HubItemsPojo.Data.Item> mItems;
+    private ArrayList<Item> mItems;
 
     public OrderSummeryPOJO(String mTapriId,
                             String mTapriName,
                             String mTotalCost,
                             UserAddress.Data mAddress,
                             String mPaymentMethod,
-                            ArrayList<HubItemsPojo.Data.Item> mItems,
+                            ArrayList<Item> mItems,
                             String mHubAddressId
                             ) {
         this.mTapriId = mTapriId;
@@ -49,11 +49,11 @@ public class OrderSummeryPOJO implements Serializable {
         this.mPaymentMethod = mPaymentMethod;
     }
 
-    public ArrayList<HubItemsPojo.Data.Item> getmItems() {
+    public ArrayList<Item> getmItems() {
         return mItems;
     }
 
-    public void setmItems(ArrayList<HubItemsPojo.Data.Item> mItems) {
+    public void setmItems(ArrayList<Item> mItems) {
         this.mItems = mItems;
     }
 

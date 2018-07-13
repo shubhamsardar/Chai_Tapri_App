@@ -2,6 +2,7 @@ package `in`.co.tripin.chai_tapri_app.activities
 
 import `in`.co.tripin.chai_tapri_app.Managers.Logger
 import `in`.co.tripin.chai_tapri_app.Managers.PreferenceManager
+import `in`.co.tripin.chai_tapri_app.POJOs.Models.Item
 import `in`.co.tripin.chai_tapri_app.POJOs.Models.OrderSummeryPOJO
 import `in`.co.tripin.chai_tapri_app.POJOs.Models.UserAddress
 import `in`.co.tripin.chai_tapri_app.POJOs.Responces.HubItemsPojo
@@ -183,7 +184,7 @@ class NewStockActivity : AppCompatActivity() {
 
 
         mProceedToPay!!.setOnClickListener {
-            val mItems = ArrayList<HubItemsPojo.Data.Item>()
+            val mItems = ArrayList<Item>()
             var cost = 0.0
 
 

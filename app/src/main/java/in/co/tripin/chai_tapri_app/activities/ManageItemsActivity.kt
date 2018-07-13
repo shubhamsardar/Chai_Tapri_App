@@ -8,6 +8,7 @@ import `in`.co.tripin.chai_tapri_app.POJOs.Responces.HubMenuResponce
 import `in`.co.tripin.chai_tapri_app.POJOs.Responces.MappedHubResponce
 import `in`.co.tripin.chai_tapri_app.R
 import `in`.co.tripin.chai_tapri_app.adapters.ItemSelectionCallback
+import `in`.co.tripin.chai_tapri_app.adapters.ItemToggleCallback
 import `in`.co.tripin.chai_tapri_app.adapters.ItemsListAdapter
 import `in`.co.tripin.chai_tapri_app.adapters.ItemsToggleAdapter
 import `in`.co.tripin.chai_tapri_app.networking.APIService
@@ -17,6 +18,8 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import com.android.volley.AuthFailureError
@@ -107,7 +110,6 @@ class ManageItemsActivity : AppCompatActivity() {
         dialog = SpotsDialog.Builder()
                 .setContext(this)
                 .setCancelable(false)
-                .setMessage("Fetching Menu")
                 .build()
 
         mCompositeDisposable = CompositeDisposable()
@@ -196,60 +198,110 @@ class ManageItemsActivity : AppCompatActivity() {
         queue!!.add(getRequest)
     }
 
+    private fun hitToggleItemAPI(tapriId : String, operation:String) {
+
+        Logger.v("Toggle $tapriId : $operation")
+        dialog!!.show()
+        val url = "http://192.168.1.21:3055/api/v1/tapri/items/$tapriId/$operation"
+
+        val getRequest = object : JsonObjectRequest(Request.Method.PATCH, url, null,
+                Response.Listener { response ->
+                    // display response
+                    //Toast.makeText(getApplicationContext(), "List Fetched!", Toast.LENGTH_SHORT).show();
+                    dialog!!.dismiss()
+                    Toast.makeText(applicationContext, "Item $operation", Toast.LENGTH_SHORT).show()
+
+                    Logger.v("ResponseToggle: " + response.toString())
+
+                },
+                Response.ErrorListener { error ->
+                    Logger.v("Error.Response: " + error.message.toString())
+                    Toast.makeText(applicationContext, "Server Error", Toast.LENGTH_SHORT).show()
+                    dialog!!.dismiss()
+                }
+        ) {
+            @Throws(AuthFailureError::class)
+            override fun getHeaders(): Map<String, String> {
+                val params = HashMap<String, String>()
+                params["Content-Type"] = "application/json"
+                params["token"] = preferenceManager!!.accessToken
+                return params
+            }
+
+
+            override fun getBodyContentType(): String {
+                return "application/json; charset=utf-8"
+            }
+
+
+        }
+        queue!!.add(getRequest)
+    }
+
     private fun setItems(data: HubItemsPojo.Data) {
 
         setListVisiblity(data)
 
 
-        mBeveragesAdapter = ItemsToggleAdapter(this, data.beverages, object : ItemSelectionCallback {
-            override fun onitemAdded(cost: Double?, quant: Int) {
-                mTotalCost = mTotalCost!! + cost!! * quant
-                updateTotalCostUI()
+        mBeveragesAdapter = ItemsToggleAdapter(this, data.beverages, object : ItemToggleCallback {
+
+            override fun onItemInactive(itemId: String?) {
+                if (itemId != null) {
+                    hitToggleItemAPI(itemId,"active")
+                }
             }
 
-            override fun onItemRemoved(cost: Double?, quant: Int) {
-                mTotalCost = mTotalCost!! - cost!! * quant
-                updateTotalCostUI()
+            override fun onitemActive(itemId: String?) {
+                if (itemId != null) {
+                    hitToggleItemAPI(itemId,"inactive")
+                }
+            }
+        })
+        mExtrasAdapter = ItemsToggleAdapter(this, data.extra, object : ItemToggleCallback {
+
+            override fun onItemInactive(itemId: String?) {
+                if (itemId != null) {
+                    hitToggleItemAPI(itemId,"active")
+                }
+
+            }
+
+            override fun onitemActive(itemId: String?) {
+                if (itemId != null) {
+                    hitToggleItemAPI(itemId,"inactive")
+                }
 
             }
         })
-        mExtrasAdapter = ItemsToggleAdapter(this, data.extra, object : ItemSelectionCallback {
-            override fun onitemAdded(cost: Double?, quant: Int) {
-                mTotalCost = mTotalCost!! + cost!! * quant
-                updateTotalCostUI()
+        mSnacksAdapter = ItemsToggleAdapter(this, data.snacks, object : ItemToggleCallback {
+
+            override fun onItemInactive(itemId: String?) {
+                if (itemId != null) {
+                    hitToggleItemAPI(itemId,"active")
+                }
 
             }
 
-            override fun onItemRemoved(cost: Double?, quant: Int) {
-                mTotalCost = mTotalCost!! - cost!! * quant
-                updateTotalCostUI()
-
-            }
-        })
-        mSnacksAdapter = ItemsToggleAdapter(this, data.snacks, object : ItemSelectionCallback {
-            override fun onitemAdded(cost: Double?, quant: Int) {
-                mTotalCost = mTotalCost!! + cost!! * quant
-                updateTotalCostUI()
-
-            }
-
-            override fun onItemRemoved(cost: Double?, quant: Int) {
-                mTotalCost = mTotalCost!! - cost!! * quant
-                updateTotalCostUI()
-
+            override fun onitemActive(itemId: String?) {
+                if (itemId != null) {
+                    hitToggleItemAPI(itemId,"inactive")
+                }
             }
         })
-        mChahiyehAdapter = ItemsToggleAdapter(this, data.chaihiyeh, object : ItemSelectionCallback {
-            override fun onitemAdded(cost: Double?, quant: Int) {
-                mTotalCost = mTotalCost!! + cost!! * quant
-                updateTotalCostUI()
+
+        mChahiyehAdapter = ItemsToggleAdapter(this, data.chaihiyeh,object : ItemToggleCallback {
+
+            override fun onItemInactive(itemId: String?) {
+                if (itemId != null) {
+                    hitToggleItemAPI(itemId,"active")
+                }
 
             }
 
-            override fun onItemRemoved(cost: Double?, quant: Int) {
-                mTotalCost = mTotalCost!! - cost!! * quant
-                updateTotalCostUI()
-
+            override fun onitemActive(itemId: String?) {
+                if (itemId != null) {
+                    hitToggleItemAPI(itemId,"inactive")
+                }
             }
         })
 
@@ -303,6 +355,23 @@ class ManageItemsActivity : AppCompatActivity() {
 
     private fun updateTotalCostUI() {
         //proceedtopay.text = "Proceed: ₹$mTotalCost"
+    }
+
+    // create an action bar button
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_order_history, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    // handle button activities
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+
+        if (id == R.id.action_refresh) {
+            hitTapritemsListAPI(preferenceManager.tapriId)
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
 

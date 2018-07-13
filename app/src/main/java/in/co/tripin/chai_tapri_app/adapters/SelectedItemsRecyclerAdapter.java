@@ -10,6 +10,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import in.co.tripin.chai_tapri_app.POJOs.Models.Item;
 import in.co.tripin.chai_tapri_app.POJOs.Responces.HubItemsPojo;
 import in.co.tripin.chai_tapri_app.POJOs.Responces.HubMenuResponce;
 import in.co.tripin.chai_tapri_app.POJOs.Responces.OrderHistoryResponce;
@@ -21,7 +22,7 @@ public class SelectedItemsRecyclerAdapter extends RecyclerView.Adapter<SelectedI
 
     public List<PendingOrdersResponce.Datum.Detail> data;
     public OrderHistoryResponce.Data.Details[] details;
-    private ArrayList<HubItemsPojo.Data.Item> mItems;
+    private ArrayList<Item> mItems;
 
 
     public SelectedItemsRecyclerAdapter(List<PendingOrdersResponce.Datum.Detail> data) {
@@ -32,7 +33,7 @@ public class SelectedItemsRecyclerAdapter extends RecyclerView.Adapter<SelectedI
         this.details = details;
     }
 
-    public SelectedItemsRecyclerAdapter(ArrayList<HubItemsPojo.Data.Item> items) {
+    public SelectedItemsRecyclerAdapter(ArrayList<Item> items) {
         this.mItems = items;
     }
 
