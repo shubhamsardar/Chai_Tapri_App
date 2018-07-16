@@ -480,6 +480,15 @@ public class PendingOrdersResponce {
 
             }
 
+            public String getFullAddressString(){
+                return getLandmark()+", "
+                        +getFlatSociety()+", "
+                        +getAddressLine1()+", "
+                        +getAddressLine2()+", "
+                        +getCity()+", "
+                        +getCountry();
+            }
+
         }
 
         public class TapriId {

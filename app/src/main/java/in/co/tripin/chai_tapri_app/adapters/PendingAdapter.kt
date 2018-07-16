@@ -78,6 +78,7 @@ class PendingAdapter(val data: List<PendingOrdersResponce.Datum>,
         fun bindItems(order : PendingOrdersResponce.Datum) = with(itemView)  {
 
             itemView.totalcost.text = "₹"+order.totalAmount.toString()
+            itemView.addressall.text = order.addressId.fullAddressString
 
             val selectedItemsRecyclerAdapter = SelectedItemsRecyclerAdapter(order.details)
             val layoutManager = CustomLinearLayoutManager(context)

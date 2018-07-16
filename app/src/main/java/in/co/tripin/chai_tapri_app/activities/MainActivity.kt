@@ -2,25 +2,25 @@ package `in`.co.tripin.chai_tapri_app.activities
 
 import `in`.co.tripin.chai_tapri_app.Managers.Logger
 import `in`.co.tripin.chai_tapri_app.Managers.PreferenceManager
-import `in`.co.tripin.chai_tapri_app.POJOs.Bodies.LogInBody
-import `in`.co.tripin.chai_tapri_app.POJOs.Responces.LogInResponce
 import `in`.co.tripin.chai_tapri_app.POJOs.Responces.PendingOrdersResponce
 import `in`.co.tripin.chai_tapri_app.R
 import `in`.co.tripin.chai_tapri_app.adapters.PendingAdapter
 import `in`.co.tripin.chai_tapri_app.adapters.PendingOrdersInteractionCallback
 import `in`.co.tripin.chai_tapri_app.networking.APIService
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
+import android.support.v4.app.ActivityCompat
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -38,7 +38,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import org.json.JSONObject
-import retrofit2.Response
 import java.util.HashMap
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, PendingOrdersInteractionCallback {
@@ -210,8 +209,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     @SuppressLint("MissingPermission")
     override fun onCalledCustomer(mMobile: String?) {
         //call to admin
-        val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$mMobile"))
-        startActivity(intent)    }
+        if(isPermissionGranted()){
+            call_action(mMobile)
+        }
+    }
 
     private fun callEditOrderAPI(mOrderId: String?, mOperation :String) {
 
@@ -242,4 +243,48 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         queue!!.add(getRequest)
     }
+
+    fun isPermissionGranted(): Boolean {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                Log.v("TAG", "Permission is granted")
+                return true
+            } else {
+
+                Log.v("TAG", "Permission is revoked")
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CALL_PHONE), 1)
+                return false
+            }
+        } else { //permission is automatically granted on sdk<23 upon installation
+            Log.v("TAG", "Permission is granted")
+            return true
+        }
+    }
+
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+
+            1 -> {
+
+                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(applicationContext, "Permission granted", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(applicationContext, "Permission denied", Toast.LENGTH_SHORT).show()
+                }
+                return
+            }
+        }// other 'case' lines to check for other
+        // permissions this app might request
+    }
+
+    @SuppressLint("MissingPermission")
+    fun call_action(mMobile: String?) {
+        val callIntent = Intent(Intent.ACTION_CALL)
+        callIntent.data = Uri.parse("tel:$mMobile")
+        startActivity(callIntent)
+    }
+
+
 }

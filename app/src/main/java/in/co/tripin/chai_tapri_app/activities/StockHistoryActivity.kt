@@ -4,6 +4,7 @@ import `in`.co.tripin.chai_tapri_app.Managers.Logger
 import `in`.co.tripin.chai_tapri_app.Managers.PreferenceManager
 import `in`.co.tripin.chai_tapri_app.POJOs.Responces.OrderHistoryResponce
 import `in`.co.tripin.chai_tapri_app.R
+import `in`.co.tripin.chai_tapri_app.adapters.MarkRecivedCallback
 import `in`.co.tripin.chai_tapri_app.adapters.OrderHistoryRecyclerAdapter
 import `in`.co.tripin.chai_tapri_app.adapters.StockHistoryRecyclerAdapter
 import android.app.AlertDialog
@@ -19,6 +20,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import com.android.volley.AuthFailureError
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
@@ -112,7 +114,10 @@ class StockHistoryActivity : AppCompatActivity() {
     private fun setAdapter(data: Array<OrderHistoryResponce.Data>) {
 
         Logger.v("adapter set")
-        orderHistoryRecyclerAdapter = StockHistoryRecyclerAdapter(this, data)
+        orderHistoryRecyclerAdapter = StockHistoryRecyclerAdapter(this, data, MarkRecivedCallback {
+
+            hitToggleItemAPI(it,"received")
+        })
         mOderHistoryList!!.adapter = orderHistoryRecyclerAdapter
     }
 
@@ -142,5 +147,45 @@ class StockHistoryActivity : AppCompatActivity() {
         //            //call to enquiry
         //        }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun hitToggleItemAPI(orderId : String, operation:String) {
+
+        Logger.v("Toggle $orderId : $operation")
+        dialog!!.show()
+        val url = "http://192.168.1.21:3055/api/v2/order/$orderId/status/$operation"
+
+        val getRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
+                Response.Listener { response ->
+                    // display response
+                    //Toast.makeText(getApplicationContext(), "List Fetched!", Toast.LENGTH_SHORT).show();
+                    dialog!!.dismiss()
+                    Toast.makeText(applicationContext, "Item $operation", Toast.LENGTH_SHORT).show()
+
+                    Logger.v("ResponseToggle: " + response.toString())
+
+                },
+                Response.ErrorListener { error ->
+                    Logger.v("Error.Response: " + error.message.toString())
+                    Toast.makeText(applicationContext, "Server Error", Toast.LENGTH_SHORT).show()
+                    dialog!!.dismiss()
+                }
+        ) {
+            @Throws(AuthFailureError::class)
+            override fun getHeaders(): Map<String, String> {
+                val params = HashMap<String, String>()
+                params["Content-Type"] = "application/json"
+                params["token"] = preferenceManager!!.accessToken
+                return params
+            }
+
+
+            override fun getBodyContentType(): String {
+                return "application/json; charset=utf-8"
+            }
+
+
+        }
+        queue!!.add(getRequest)
     }
 }

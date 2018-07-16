@@ -18,10 +18,12 @@ public class StockHistoryRecyclerAdapter extends RecyclerView.Adapter<StockHisto
 
     public OrderHistoryResponce.Data[] data;
     public Context context;
+    public MarkRecivedCallback markRecivedCallback;
 
-    public StockHistoryRecyclerAdapter(Context context, OrderHistoryResponce.Data[] data) {
+    public StockHistoryRecyclerAdapter(Context context, OrderHistoryResponce.Data[] data, MarkRecivedCallback markRecivedCallback) {
         this.data = data;
         this.context = context;
+        this.markRecivedCallback = markRecivedCallback;
     }
 
     @NonNull
@@ -55,6 +57,18 @@ public class StockHistoryRecyclerAdapter extends RecyclerView.Adapter<StockHisto
             holder.mOrderId.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_arrow_drop_up_black_24dp, 0, 0, 0);
         }
 
+        holder.mMarkRecived.setVisibility(View.GONE);
+        if(data[position].getOrderStatus().toUpperCase().equals("On the way".toUpperCase())){
+            holder.mMarkRecived.setVisibility(View.VISIBLE);
+        }
+
+        holder.mMarkRecived.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                markRecivedCallback.onMarkRecived(data[position].get_id());
+            }
+        });
+
 
 
 
@@ -74,7 +88,7 @@ public class StockHistoryRecyclerAdapter extends RecyclerView.Adapter<StockHisto
         public TextView mAddress;
         public TextView mPaymentMethod;
         public RecyclerView mSelctedItemsList;
-        public Switch mRecivedSwitch;
+        public TextView mMarkRecived;
         public TextView mOrderId;
         public TextView mOrderStatus;
         public LinearLayout mHeader;
@@ -93,6 +107,8 @@ public class StockHistoryRecyclerAdapter extends RecyclerView.Adapter<StockHisto
             mHeader = itemView.findViewById(R.id.order_header);
             mBody = itemView.findViewById(R.id.order_footer);
             mDate = itemView.findViewById(R.id.orderdate);
+            mMarkRecived = itemView.findViewById(R.id.markRecieved);
+
 
 
             mHeader.setOnClickListener(new View.OnClickListener() {
@@ -109,6 +125,8 @@ public class StockHistoryRecyclerAdapter extends RecyclerView.Adapter<StockHisto
                     }
                 }
             });
+
+
 
         }
     }
