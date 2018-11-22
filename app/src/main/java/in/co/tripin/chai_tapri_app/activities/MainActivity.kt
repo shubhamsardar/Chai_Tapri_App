@@ -1,8 +1,10 @@
 package `in`.co.tripin.chai_tapri_app.activities
 
+import `in`.co.tripin.chai_tapri_app.Helper.Constants
 import `in`.co.tripin.chai_tapri_app.Managers.Logger
 import `in`.co.tripin.chai_tapri_app.Managers.PreferenceManager
 import `in`.co.tripin.chai_tapri_app.POJOs.Responces.PendingOrdersResponce
+import `in`.co.tripin.chai_tapri_app.POJOs.Responces.TapriStatusResponce
 import `in`.co.tripin.chai_tapri_app.R
 import `in`.co.tripin.chai_tapri_app.adapters.PendingAdapter
 import `in`.co.tripin.chai_tapri_app.adapters.PendingOrdersInteractionCallback
@@ -10,6 +12,8 @@ import `in`.co.tripin.chai_tapri_app.networking.APIService
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -24,12 +28,15 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Switch
+import android.widget.TextView
 import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.google.gson.Gson
 import dmax.dialog.SpotsDialog
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -37,6 +44,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.nav_header_main.*
 import org.json.JSONObject
 import java.util.HashMap
 
@@ -46,13 +54,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     lateinit var switch: Switch
     private var dialog: AlertDialog? = null
+    private var isActive = false
 
+    lateinit var mContext : Context
     lateinit var apiService: APIService
     private var mCompositeDisposable: CompositeDisposable? = null
     lateinit var preferenceManager: PreferenceManager
     private var queue: RequestQueue? = null
     lateinit var linearLayoutManager :LinearLayoutManager
-
+    lateinit var pinMenuItem: MenuItem
+    lateinit var gson: Gson
+    lateinit var tapriname : TextView
 
 
 
@@ -60,6 +72,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+        mContext = this
+        gson = Gson()
         mCompositeDisposable = CompositeDisposable()
         apiService = APIService.create()
         preferenceManager = PreferenceManager.getInstance(this)
@@ -83,6 +97,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             fetchPendingOrders()
         }
 
+
+        if(preferenceManager.userName!=null){
+            tapriname = nav_view.getHeaderView(0).findViewById(R.id.tapriname)
+            tapriname.text = preferenceManager.userName.toUpperCase()
+        }
+
     }
 
     override fun onStart() {
@@ -104,13 +124,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
-            super.onBackPressed()
+            finish()
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
+        pinMenuItem = menu.findItem(R.id.action_settings)
         return true
     }
 
@@ -119,7 +140,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_settings ->{
+                if(isActive){
+                    toggleTapriAvailablity("inactive")
+                }else{
+                    toggleTapriAvailablity("active")
+                }
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -158,6 +186,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 startActivity(intent)
                 finish()
             }
+
+            R.id.nav_rate -> {
+                rateApp()
+            }
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)
@@ -180,6 +212,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 title = "$size Orders Pending"
             }
         }
+        getTapriAvailablity()
 
     }
 
@@ -218,7 +251,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         Logger.v("Marking Order Recived")
         dialog!!.show()
-        val url = "http://192.168.1.21:3055/api/v2/order/$mOrderId/status/$mOperation"
+        val url = Constants.BASE_URL+"api/v2/order/$mOrderId/status/$mOperation"
         val getRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 com.android.volley.Response.Listener<JSONObject> { response ->
                     // display response
@@ -227,6 +260,75 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     Toast.makeText(this,mOperation, Toast.LENGTH_LONG).show()
                     fetchPendingOrders()
 
+                },
+                com.android.volley.Response.ErrorListener { error ->
+                    dialog!!.dismiss()
+                    Logger.d("Error.Response: " + error.toString())
+                    Toast.makeText(applicationContext, "Server Error", Toast.LENGTH_SHORT).show()
+                }
+        ) {
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["token"] = preferenceManager!!.accessToken
+                return params
+            }
+        }
+        queue!!.add(getRequest)
+    }
+
+    private fun toggleTapriAvailablity(mOperation: String) {
+
+        Logger.v("Toggeling Availablity")
+        dialog!!.show()
+        val url = Constants.BASE_URL+"api/v1/tapri/$mOperation"
+        val getRequest = object : JsonObjectRequest(Request.Method.PATCH, url, null,
+                com.android.volley.Response.Listener<JSONObject> { response ->
+                    // display response
+                    dialog!!.dismiss()
+                    Logger.v("ResponseEdit :" + response.toString())
+                    getTapriAvailablity()
+                    Toast.makeText(this,"Tapri ${mOperation.toUpperCase()}", Toast.LENGTH_LONG).show()
+                },
+                com.android.volley.Response.ErrorListener { error ->
+                    dialog!!.dismiss()
+                    Logger.d("Error.Response: " + error.toString())
+                    Toast.makeText(applicationContext, "Server Error", Toast.LENGTH_SHORT).show()
+                }
+        ) {
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["token"] = preferenceManager!!.accessToken
+                return params
+            }
+        }
+        queue!!.add(getRequest)
+    }
+
+    private fun getTapriAvailablity() {
+
+        Logger.v("Getting Tapri Availablity")
+        dialog!!.show()
+        val url = Constants.BASE_URL+"api/v1/tapri/status"
+        val getRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
+                com.android.volley.Response.Listener<JSONObject> { response ->
+                    // display response
+                    dialog!!.dismiss()
+                    Logger.v("ResponseStatus :" + response.toString())
+                    val tapriStatusResponce : TapriStatusResponce = gson.fromJson(response.toString(),TapriStatusResponce::class.java)
+                    if(tapriStatusResponce.data.flag == 1){
+                        pinMenuItem.setIcon(R.drawable.ic_togglebn_avail)
+                        isActive = true
+                        supportActionBar!!.subtitle = "Active for new orders"
+                        inactivewarning.visibility = View.GONE
+
+                    }else{
+                        pinMenuItem.setIcon(R.drawable.ic_togglebtn_unavail)
+                        isActive = false
+                        supportActionBar!!.subtitle = "Inactive for new orders"
+                        inactivewarning.visibility = View.VISIBLE
+                    }
                 },
                 com.android.volley.Response.ErrorListener { error ->
                     dialog!!.dismiss()
@@ -281,9 +383,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     @SuppressLint("MissingPermission")
     fun call_action(mMobile: String?) {
+        Logger.v("Mobile : $mMobile")
         val callIntent = Intent(Intent.ACTION_CALL)
         callIntent.data = Uri.parse("tel:$mMobile")
         startActivity(callIntent)
+    }
+
+
+    internal fun rateApp() {
+        val uri = Uri.parse("market://details?id=" + mContext.getPackageName())
+        val goToMarket = Intent(Intent.ACTION_VIEW, uri)
+        // To count with Play market backstack, After pressing back button,
+        // to taken back to our application, we need to add following flags to intent.
+        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or
+                Intent.FLAG_ACTIVITY_NEW_DOCUMENT or
+                Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+        try {
+            startActivity(goToMarket)
+        } catch (e: ActivityNotFoundException) {
+            startActivity(Intent(Intent.ACTION_VIEW,
+                    Uri.parse("http://play.google.com/store/apps/details?id=" + mContext.getPackageName())))
+        }
+
     }
 
 

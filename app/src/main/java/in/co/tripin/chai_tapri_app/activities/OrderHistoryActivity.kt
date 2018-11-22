@@ -1,5 +1,6 @@
 package `in`.co.tripin.chai_tapri_app.activities
 
+import `in`.co.tripin.chai_tapri_app.Helper.Constants
 import `in`.co.tripin.chai_tapri_app.Managers.Logger
 import `in`.co.tripin.chai_tapri_app.Managers.PreferenceManager
 import `in`.co.tripin.chai_tapri_app.POJOs.Responces.OrderHistoryResponce
@@ -70,7 +71,7 @@ class OrderHistoryActivity : AppCompatActivity() {
 
         Logger.v("fetch List of Order History..")
         dialog!!.show()
-        val url = "http://192.168.1.21:3055/api/v2/tapri/orders"
+        val url = Constants.BASE_URL+"api/v2/tapri/orders"
         val getRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 Response.Listener<JSONObject> { response ->
                     // display response

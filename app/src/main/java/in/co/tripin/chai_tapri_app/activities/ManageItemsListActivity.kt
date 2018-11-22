@@ -1,5 +1,6 @@
 package `in`.co.tripin.chai_tapri_app.activities
 
+import `in`.co.tripin.chai_tapri_app.Helper.Constants
 import `in`.co.tripin.chai_tapri_app.Managers.Logger
 import `in`.co.tripin.chai_tapri_app.Managers.PreferenceManager
 import `in`.co.tripin.chai_tapri_app.POJOs.Models.Item
@@ -192,7 +193,7 @@ class ManageItemsListActivity : AppCompatActivity() {
 
         Logger.v("getting menu...")
         dialog!!.show()
-        val url = "http://192.168.1.21:3055/api/v1/tapri/items/all"
+        val url = Constants.BASE_URL+"api/v1/tapri/items/all"
 
         val getRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 Response.Listener { response ->
@@ -451,7 +452,7 @@ class ManageItemsListActivity : AppCompatActivity() {
     private fun HitSaveChangesAPI() {
         Logger.v("saving changes")
         dialog!!.show()
-        val url = "http://192.168.1.21:3055/api/v1/tapri/items/edit"
+        val url = Constants.BASE_URL+"api/v1/tapri/items/edit"
         val getRequest = object : JsonObjectRequest(Request.Method.PATCH, url, null,
                 Response.Listener { response ->
                     // display response

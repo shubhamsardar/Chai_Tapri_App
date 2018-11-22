@@ -1,5 +1,6 @@
 package `in`.co.tripin.chai_tapri_app.activities
 
+import `in`.co.tripin.chai_tapri_app.Helper.Constants
 import `in`.co.tripin.chai_tapri_app.Managers.Logger
 import `in`.co.tripin.chai_tapri_app.Managers.PreferenceManager
 import `in`.co.tripin.chai_tapri_app.POJOs.Models.UserAddress
@@ -162,7 +163,7 @@ class ManageItemsActivity : AppCompatActivity() {
 
         Logger.v("getting menu...")
         dialog!!.show()
-        val url = "http://192.168.1.21:3055/api/v1/tapri/items/all"
+        val url = Constants.BASE_URL+"api/v1/tapri/items/all"
 
         val getRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 Response.Listener { response ->
@@ -202,7 +203,7 @@ class ManageItemsActivity : AppCompatActivity() {
 
         Logger.v("Toggle $tapriId : $operation")
         dialog!!.show()
-        val url = "http://192.168.1.21:3055/api/v1/tapri/items/$tapriId/$operation"
+        val url = Constants.BASE_URL+"api/v1/tapri/items/$tapriId/$operation"
 
         val getRequest = object : JsonObjectRequest(Request.Method.PATCH, url, null,
                 Response.Listener { response ->

@@ -1,5 +1,6 @@
 package `in`.co.tripin.chai_tapri_app.activities
 
+import `in`.co.tripin.chai_tapri_app.Helper.Constants
 import `in`.co.tripin.chai_tapri_app.Managers.Logger
 import `in`.co.tripin.chai_tapri_app.Managers.PreferenceManager
 import `in`.co.tripin.chai_tapri_app.POJOs.Models.Item
@@ -253,7 +254,9 @@ class NewStockActivity : AppCompatActivity() {
 
 
             if (address == null) {
+
                 Toast.makeText(applicationContext, "Address Required!", Toast.LENGTH_LONG).show()
+
             } else {
 
                 val paymentMethod = "COD"
@@ -348,7 +351,25 @@ class NewStockActivity : AppCompatActivity() {
             mAddressInclude!!.visibility = View.GONE
         } else {
             mAddressInclude!!.visibility = View.VISIBLE
-            address = gson!!.fromJson(preferenceManager!!.getHubAddress(), UserAddress.Data::class.java)
+            address = gson!!.fromJson("{\n" +
+                    "\t\t\"_id\": \"5bdaed4d43b03b0010522a47\",\n" +
+                    "\t\t\"updatedAt\": \"2018-11-01T12:10:53.752Z\",\n" +
+                    "\t\t\"createdAt\": \"2018-11-01T12:10:53.752Z\",\n" +
+                    "\t\t\"nickname\": \"711\",\n" +
+                    "\t\t\"flatSociety\": \"711\",\n" +
+                    "\t\t\"addressLine1\": \"Summit\",\n" +
+                    "\t\t\"addressLine2\": \"omkar\",\n" +
+                    "\t\t\"country\": \"India\",\n" +
+                    "\t\t\"state\": \"Maharashtra\",\n" +
+                    "\t\t\"city\": \"Mumbai\",\n" +
+                    "\t\t\"landmark\": \"Metro\",\n" +
+                    "\t\t\"userId\": \"5bab6b39c843a4001531829f\",\n" +
+                    "\t\t\"__v\": 0,\n" +
+                    "\t\t\"flag\": 1,\n" +
+                    "\t\t\"location\": {\n" +
+                    "\t\t\t\"coordinates\": []\n" +
+                    "\t\t}\n" +
+                    "\t}", UserAddress.Data::class.java)
             mAddressFull!!.text = address!!.fullAddressString
 
         }
@@ -358,7 +379,7 @@ class NewStockActivity : AppCompatActivity() {
 
         Logger.v("getting menu...")
         dialog!!.show()
-        val url = "http://192.168.1.21:3055/api/v1/hub/$hubId/items/active"
+        val url = Constants.BASE_URL+"api/v1/hub/$hubId/items/active"
 
         val getRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 Response.Listener { response ->

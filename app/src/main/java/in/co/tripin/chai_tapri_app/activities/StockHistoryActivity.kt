@@ -1,5 +1,6 @@
 package `in`.co.tripin.chai_tapri_app.activities
 
+import `in`.co.tripin.chai_tapri_app.Helper.Constants
 import `in`.co.tripin.chai_tapri_app.Managers.Logger
 import `in`.co.tripin.chai_tapri_app.Managers.PreferenceManager
 import `in`.co.tripin.chai_tapri_app.POJOs.Responces.OrderHistoryResponce
@@ -74,7 +75,7 @@ class StockHistoryActivity : AppCompatActivity() {
 
         Logger.v("fetch List of Order History..")
         dialog!!.show()
-        val url = "http://192.168.1.21:3055/api/v2/tapri/stock"
+        val url = Constants.BASE_URL+"api/v2/tapri/stock"
         val getRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 Response.Listener<JSONObject> { response ->
                     // display response
@@ -153,7 +154,7 @@ class StockHistoryActivity : AppCompatActivity() {
 
         Logger.v("Toggle $orderId : $operation")
         dialog!!.show()
-        val url = "http://192.168.1.21:3055/api/v2/order/$orderId/status/$operation"
+        val url = Constants.BASE_URL+"api/v2/order/$orderId/status/$operation"
 
         val getRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 Response.Listener { response ->
@@ -161,8 +162,8 @@ class StockHistoryActivity : AppCompatActivity() {
                     //Toast.makeText(getApplicationContext(), "List Fetched!", Toast.LENGTH_SHORT).show();
                     dialog!!.dismiss()
                     Toast.makeText(applicationContext, "Item $operation", Toast.LENGTH_SHORT).show()
-
                     Logger.v("ResponseToggle: " + response.toString())
+                    callOrderHistoryAPI()
 
                 },
                 Response.ErrorListener { error ->
