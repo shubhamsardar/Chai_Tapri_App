@@ -1,8 +1,12 @@
 package `in`.co.tripin.chai_tapri_app.activities
 
+import `in`.co.tripin.chai_tapri_app.Helper.Constants
+import `in`.co.tripin.chai_tapri_app.Managers.Logger
 import `in`.co.tripin.chai_tapri_app.Managers.PreferenceManager
 import `in`.co.tripin.chai_tapri_app.POJOs.Bodies.LogInBody
 import `in`.co.tripin.chai_tapri_app.POJOs.Responces.LogInResponce
+import `in`.co.tripin.chai_tapri_app.POJOs.Responces.TapriStatusResponce
+import `in`.co.tripin.chai_tapri_app.POJOs.Responces.TapriTypePojo
 import `in`.co.tripin.chai_tapri_app.R
 import `in`.co.tripin.chai_tapri_app.networking.APIClient
 import android.content.Intent
@@ -19,15 +23,24 @@ import android.R.attr.name
 import android.R.attr.data
 import android.app.AlertDialog
 import android.util.Log
+import android.view.View
 import android.widget.EditText
 import android.widget.Toast
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
 import com.google.gson.Gson
+import com.keiferstone.nonet.NoNet
 import dmax.dialog.SpotsDialog
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.content_main.*
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Response
+import java.util.HashMap
 import javax.security.auth.callback.Callback
 
 
@@ -38,6 +51,8 @@ class LoginActivity : AppCompatActivity() {
     lateinit var mobile: EditText
     lateinit var pin: EditText
     private var dialog: AlertDialog? = null
+    private var queue: RequestQueue? = null
+
 
 
     lateinit var awesomeValidation: AwesomeValidation
@@ -52,6 +67,8 @@ class LoginActivity : AppCompatActivity() {
         mCompositeDisposable = CompositeDisposable()
         apiSetvice = APIService.create()
         preferenceManager = PreferenceManager.getInstance(this)
+        queue = Volley.newRequestQueue(this)
+
 
         dialog = SpotsDialog.Builder()
                 .setContext(this)
@@ -62,6 +79,7 @@ class LoginActivity : AppCompatActivity() {
         title = "Log In"
         init()
         setListners()
+        internetCheck()
     }
 
 
@@ -138,9 +156,7 @@ class LoginActivity : AppCompatActivity() {
                     Log.v("token: ",preferenceManager.accessToken)
                     preferenceManager.mobileNo = loginResponce.data.mobile
                     preferenceManager.userName = loginResponce.data.name
-                    val intent = Intent(this,MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    getTapriType()
                 }else{
                     Toast.makeText(applicationContext,"Not A User! Register First",Toast.LENGTH_LONG).show()
                     val intent = Intent(this,SpalshActivity::class.java)
@@ -148,7 +164,15 @@ class LoginActivity : AppCompatActivity() {
                     finish()
                 }
 
+            }else{
+                Log.v("OnResponceLogin","failed Logged In")
+                Toast.makeText(applicationContext,"Login Failed!",Toast.LENGTH_LONG).show()
             }
+        }else{
+            Log.v("OnResponceLogin","null")
+            Toast.makeText(applicationContext,"Responce Null",Toast.LENGTH_LONG).show()
+
+
         }
 
 
@@ -166,6 +190,55 @@ class LoginActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         mCompositeDisposable?.clear()
+    }
+
+    private fun getTapriType() {
+
+        Logger.v("Getting Tapri Type")
+        dialog!!.show()
+        val url = Constants.BASE_URL + "api/v1/tapri/fixed"
+        val getRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
+                com.android.volley.Response.Listener<JSONObject> { response ->
+                    // display response
+                    dialog!!.dismiss()
+                    Logger.v("ResponseStatus :" + response.toString())
+                    val tapriStatusResponce: TapriTypePojo = Gson().fromJson(response.toString(), TapriTypePojo::class.java)
+                    if (tapriStatusResponce.data.isFixed == 1) {
+                        preferenceManager.tapriType = "1"
+                    } else {
+                        preferenceManager.tapriType = "0"
+                    }
+
+                    Toast.makeText(applicationContext, "Login Success!", Toast.LENGTH_SHORT).show()
+
+                    Logger.v("Tapri Type :" + preferenceManager.tapriType)
+
+                    val intent = Intent(this,MainActivity::class.java)
+                    startActivity(intent)
+                    finishAffinity()
+
+                },
+                com.android.volley.Response.ErrorListener { error ->
+                    dialog!!.dismiss()
+                    Logger.d("Error.Response: " + error.toString())
+                    preferenceManager.accessToken = null
+                    Toast.makeText(applicationContext, "Server Error", Toast.LENGTH_SHORT).show()
+                }
+        ) {
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["token"] = preferenceManager.accessToken
+                return params
+            }
+        }
+        queue!!.add(getRequest)
+    }
+
+    private fun internetCheck() {
+        NoNet.monitor(this)
+                .poll()
+                .snackbar()
     }
 
 

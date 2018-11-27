@@ -33,6 +33,7 @@ import com.android.volley.*
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.google.gson.Gson
+import com.keiferstone.nonet.NoNet
 import dmax.dialog.SpotsDialog
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -129,7 +130,7 @@ class NewStockActivity : AppCompatActivity() {
 
         //get hub and id from api
         fetchAssignedHubDetails()
-
+        internetCheck()
 
     }
 
@@ -555,6 +556,12 @@ class NewStockActivity : AppCompatActivity() {
 
     private fun updateTotalCostUI() {
         proceedtopay.text = "Proceed: ₹$mTotalCost"
+    }
+
+    private fun internetCheck() {
+        NoNet.monitor(this)
+                .poll()
+                .snackbar()
     }
 
 

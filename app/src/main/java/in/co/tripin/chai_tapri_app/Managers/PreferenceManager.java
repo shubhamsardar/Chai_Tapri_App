@@ -17,6 +17,8 @@ public class PreferenceManager {
     private static final String PREF_FILE_NAME = "file_name";
     private static final String PREF_HUB_ADDRESS = "hub_address";
     private static final String PREF_HUB_AID = "hub_id";
+    public static final String PREF_TAPRI_TYPE = "tapri_type";
+
 
 
 
@@ -106,6 +108,22 @@ public class PreferenceManager {
      */
     public void setHubId(String id) {
         editor.putString(PREF_HUB_AID, id);
+        editor.commit();
+    }
+
+    /**
+     * @return
+     */
+    public String getTapriType() {
+        String accessToken = sInstance.getString(PREF_TAPRI_TYPE, "1");
+        return accessToken;
+    }
+
+    /**
+     * @param type
+     */
+    public void setTapriType(String type) {
+        editor.putString(PREF_TAPRI_TYPE, type);
         editor.commit();
     }
 
