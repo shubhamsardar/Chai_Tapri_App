@@ -207,6 +207,34 @@
                     android:layout_weight="1"
                     android:fontFamily="@font/rajdhani_bold"
                     android:text="Accept" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/buttonScan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:padding="5dp"
+                android:background="@color/colorGreyLight"
+                android:gravity="center"
+                >
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/qrcode"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SCAN QR CODE"
+                    android:textColor="@color/colorPrimary"
+                    android:fontFamily="@font/rajdhani_bold"
+                    android:textSize="18dp"
+                    android:layout_marginLeft="10dp"/>
+
+
             </LinearLayout>
         </LinearLayout>
 

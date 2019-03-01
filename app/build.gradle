@@ -52,6 +52,10 @@ dependencies {
     implementation 'com.keiferstone:nonet:2.0.4'
 
 
+    //Scanner
+    implementation 'com.google.android.gms:play-services-vision:11.8.0'
+    implementation 'me.dm7.barcodescanner:zxing:1.9.8'
+
 
 }
 

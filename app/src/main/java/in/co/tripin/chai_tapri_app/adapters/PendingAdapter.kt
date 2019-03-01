@@ -3,14 +3,19 @@ package `in`.co.tripin.chai_tapri_app.adapters
 import `in`.co.tripin.chai_tapri_app.Managers.Logger
 import `in`.co.tripin.chai_tapri_app.POJOs.Responces.PendingOrdersResponce
 import `in`.co.tripin.chai_tapri_app.R
+import `in`.co.tripin.chai_tapri_app.activities.OrderHistoryActivity
+import `in`.co.tripin.chai_tapri_app.activities.QRCodeScannerActivity
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import kotlinx.android.synthetic.main.item_order_pending.view.*
@@ -62,6 +67,10 @@ class PendingAdapter(val data: List<PendingOrdersResponce.Datum>,
 //                holder.b1.text = "Contact Customer"
             }
         }
+        holder.linearLayout.setOnClickListener{
+            val intent = Intent(context, QRCodeScannerActivity::class.java)
+            context.startActivity(intent)
+        }
 
     }
 
@@ -74,6 +83,7 @@ class PendingAdapter(val data: List<PendingOrdersResponce.Datum>,
 
         val b1 = itemView.findViewById<Button>(R.id.b1)
         val b2 = itemView.findViewById<Button>(R.id.b2)
+        val linearLayout = itemView.findViewById<LinearLayout>(R.id.buttonScan);
 
 
         fun bindItems(order : PendingOrdersResponce.Datum) = with(itemView)  {
