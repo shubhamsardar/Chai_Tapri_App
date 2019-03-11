@@ -69,6 +69,7 @@ class PendingAdapter(val data: List<PendingOrdersResponce.Datum>,
         }
         holder.linearLayout.setOnClickListener{
             val intent = Intent(context, QRCodeScannerActivity::class.java)
+            intent.putExtra("ORDERID", data[position].id);
             context.startActivity(intent)
         }
 
