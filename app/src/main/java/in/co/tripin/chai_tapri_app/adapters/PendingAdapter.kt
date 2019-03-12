@@ -8,6 +8,7 @@ import `in`.co.tripin.chai_tapri_app.activities.QRCodeScannerActivity
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.opengl.Visibility
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.widget.RecyclerView
@@ -33,6 +34,9 @@ class PendingAdapter(val data: List<PendingOrdersResponce.Datum>,
     override fun onBindViewHolder(holder: PendingAdapter.ViewHolder, position: Int) {
         holder.bindItems(data[position])
         val status = data[position].orderStatus
+        val paymentType = data[position].paymentType;
+        holder.linearLayout.visibility=View.GONE
+        holder.paymentmethod.text = paymentType;
 
         if(status == "accepted"){
             holder.b2.background = ContextCompat.getDrawable(context,R.drawable.button_main_selector)
@@ -40,6 +44,10 @@ class PendingAdapter(val data: List<PendingOrdersResponce.Datum>,
             //holder.b2.setTextColor(ContextCompat.getColor(context,R.color.colorGreyLight))
             holder.b1.text = "Contact Customer"
         }else if(status == "on the way"){
+            if(paymentType == "WOD")
+            {
+                holder.linearLayout.visibility=View.VISIBLE
+            }
             holder.b2.background = null
             holder.b2.text = "On the way!"
             holder.b1.text = "Contact Customer"
@@ -67,7 +75,10 @@ class PendingAdapter(val data: List<PendingOrdersResponce.Datum>,
 //                holder.b1.text = "Contact Customer"
             }
         }
-        holder.linearLayout.setOnClickListener{
+
+
+
+            holder.linearLayout.setOnClickListener{
             val intent = Intent(context, QRCodeScannerActivity::class.java)
             intent.putExtra("ORDERID", data[position].id);
             context.startActivity(intent)
@@ -85,6 +96,7 @@ class PendingAdapter(val data: List<PendingOrdersResponce.Datum>,
         val b1 = itemView.findViewById<Button>(R.id.b1)
         val b2 = itemView.findViewById<Button>(R.id.b2)
         val linearLayout = itemView.findViewById<LinearLayout>(R.id.buttonScan);
+        val paymentmethod= itemView.findViewById<TextView>(R.id.paymentmethod);
 
 
         fun bindItems(order : PendingOrdersResponce.Datum) = with(itemView)  {

@@ -110,7 +110,7 @@ preferenceManager = PreferenceManager.getInstance(this);
     public  void  placeOrder()
     {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(" http://edd6f346.ngrok.io")
+                .baseUrl(Constants.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
