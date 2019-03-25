@@ -270,6 +270,16 @@ public class PendingOrdersResponce {
             @Expose
             private String mobile;
 
+            private Office office;
+
+            public Office getOffice() {
+                return office;
+            }
+
+            public void setOffice(Office office) {
+                this.office = office;
+            }
+
             public String getId() {
                 return id;
             }
@@ -295,6 +305,139 @@ public class PendingOrdersResponce {
             }
 
         }
+        public  class  Office
+        {
+            private String _id;
+            private String updatedAt;
+            private String createdAt;
+            private String name;
+            private String tapri;
+            private Block block;
+            private int flag;
+
+            public String get_id() {
+                return _id;
+            }
+
+            public void set_id(String _id) {
+                this._id = _id;
+            }
+
+            public String getUpdatedAt() {
+                return updatedAt;
+            }
+
+            public void setUpdatedAt(String updatedAt) {
+                this.updatedAt = updatedAt;
+            }
+
+            public String getCreatedAt() {
+                return createdAt;
+            }
+
+            public void setCreatedAt(String createdAt) {
+                this.createdAt = createdAt;
+            }
+
+            public String getName() {
+                return name;
+            }
+
+            public void setName(String name) {
+                this.name = name;
+            }
+
+            public String getTapri() {
+                return tapri;
+            }
+
+            public void setTapri(String tapri) {
+                this.tapri = tapri;
+            }
+
+            public Block getBlock() {
+                return block;
+            }
+
+            public void setBlock(Block block) {
+                this.block = block;
+            }
+
+            public int getFlag() {
+                return flag;
+            }
+
+            public void setFlag(int flag) {
+                this.flag = flag;
+            }
+        }
+        public class Block
+        {
+            private String _id;
+            private String updatedAt;
+            private String createdAt;
+            private String name;
+            private String tapri;
+            private  String area;
+            private int flag;
+
+            public String get_id() {
+                return _id;
+            }
+
+            public void set_id(String _id) {
+                this._id = _id;
+            }
+
+            public String getUpdatedAt() {
+                return updatedAt;
+            }
+
+            public void setUpdatedAt(String updatedAt) {
+                this.updatedAt = updatedAt;
+            }
+
+            public String getCreatedAt() {
+                return createdAt;
+            }
+
+            public void setCreatedAt(String createdAt) {
+                this.createdAt = createdAt;
+            }
+
+            public String getName() {
+                return name;
+            }
+
+            public void setName(String name) {
+                this.name = name;
+            }
+
+            public String getTapri() {
+                return tapri;
+            }
+
+            public void setTapri(String tapri) {
+                this.tapri = tapri;
+            }
+
+            public String getArea() {
+                return area;
+            }
+
+            public void setArea(String area) {
+                this.area = area;
+            }
+
+            public int getFlag() {
+                return flag;
+            }
+
+            public void setFlag(int flag) {
+                this.flag = flag;
+            }
+        }
+
 
         public class AddressId {
 

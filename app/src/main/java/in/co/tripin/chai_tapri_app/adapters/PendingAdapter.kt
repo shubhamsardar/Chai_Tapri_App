@@ -37,6 +37,15 @@ class PendingAdapter(val data: List<PendingOrdersResponce.Datum>,
         val paymentType = data[position].paymentType;
         holder.linearLayout.visibility=View.GONE
         holder.paymentmethod.text = paymentType;
+        holder.orderId.text ="#"+data[position].shortId
+        val timestamp = data[position].createdAt
+holder.orderDate.text = timestamp.substring(0,timestamp.indexOf('T'))
+
+        holder.tvCustName.text = data[position].userId.fullName;
+        if(data[position].userId.office!=null)
+        {
+            holder.tvBlockName.text = data[position].userId.office.name+"/ "+data[position].userId.office.block.name
+        }
 
         if(status == "accepted"){
             holder.b2.background = ContextCompat.getDrawable(context,R.drawable.button_main_selector)
@@ -97,7 +106,10 @@ class PendingAdapter(val data: List<PendingOrdersResponce.Datum>,
         val b2 = itemView.findViewById<Button>(R.id.b2)
         val linearLayout = itemView.findViewById<LinearLayout>(R.id.buttonScan);
         val paymentmethod= itemView.findViewById<TextView>(R.id.paymentmethod);
-
+        val orderId = itemView.findViewById<TextView>(R.id.orderid)
+        val orderDate = itemView.findViewById<TextView>(R.id.orderdate)
+        val tvCustName = itemView.findViewById<TextView>(R.id.tvCustName);
+        val tvBlockName = itemView.findViewById<TextView>(R.id.tvBlockName)
 
         fun bindItems(order : PendingOrdersResponce.Datum) = with(itemView)  {
 
