@@ -5,17 +5,19 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name=".MyApplication"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".activities.AddBatchActivity"></activity>
+        <activity android:name=".activities.BatchesListActivity" />
         <activity
             android:name=".activities.SpalshActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
@@ -35,7 +37,7 @@
             android:parentActivityName=".activities.SpalshActivity" />
         <activity
             android:name=".activities.ForgotPinActivity"
-            android:parentActivityName=".activities.LoginActivity"></activity>
+            android:parentActivityName=".activities.LoginActivity" />
         <activity android:name=".activities.ResetPinActivity" />
         <activity
             android:name=".activities.MainActivity"
@@ -43,7 +45,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.OrderHistoryActivity"
-            android:parentActivityName=".activities.MainActivity"></activity>
+            android:parentActivityName=".activities.MainActivity" />
         <activity
             android:name=".activities.NewStockActivity"
             android:parentActivityName=".activities.MainActivity" />
@@ -72,7 +74,7 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".activities.QRCodeScannerActivity"></activity>
+        <activity android:name=".activities.QRCodeScannerActivity" />
     </application>
 
 </manifest>
