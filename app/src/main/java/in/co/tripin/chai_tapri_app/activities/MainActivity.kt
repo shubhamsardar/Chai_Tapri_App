@@ -71,6 +71,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     lateinit var pinMenuItem: MenuItem
     lateinit var gson: Gson
     lateinit var tapriname: TextView
+    lateinit var tapUserNumber: TextView
+    lateinit var hubName: TextView
 
     var isLocationUpdated = false
 
@@ -120,6 +122,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (preferenceManager.userName != null) {
             tapriname = nav_view.getHeaderView(0).findViewById(R.id.tapriname)
             tapriname.text = preferenceManager.userName.toUpperCase()
+            tapUserNumber = nav_view.getHeaderView(0).findViewById(R.id.userNumber);
+            tapUserNumber.text = preferenceManager.mobileNo
+            hubName = nav_view.getHeaderView(0).findViewById(R.id.tvHubName);
+            hubName.text = preferenceManager.hubName
+
+
         }
 
         internetCheck()

@@ -311,6 +311,7 @@ public class PendingOrdersResponce {
             private String updatedAt;
             private String createdAt;
             private String name;
+            private String officeCode;
             private String tapri;
             private Block block;
             private int flag;
@@ -369,6 +370,14 @@ public class PendingOrdersResponce {
 
             public void setFlag(int flag) {
                 this.flag = flag;
+            }
+
+            public String getOfficeCode() {
+                return officeCode;
+            }
+
+            public void setOfficeCode(String officeCode) {
+                this.officeCode = officeCode;
             }
         }
         public class Block

@@ -5,6 +5,7 @@ import `in`.co.tripin.chai_tapri_app.Managers.Logger
 import `in`.co.tripin.chai_tapri_app.Managers.PreferenceManager
 import `in`.co.tripin.chai_tapri_app.POJOs.Bodies.LogInBody
 import `in`.co.tripin.chai_tapri_app.POJOs.Responces.LogInResponce
+import `in`.co.tripin.chai_tapri_app.POJOs.Responces.MappedHubResponce
 import `in`.co.tripin.chai_tapri_app.POJOs.Responces.TapriStatusResponce
 import `in`.co.tripin.chai_tapri_app.POJOs.Responces.TapriTypePojo
 import `in`.co.tripin.chai_tapri_app.R
@@ -36,6 +37,7 @@ import dmax.dialog.SpotsDialog
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_new_stock.*
 import kotlinx.android.synthetic.main.content_main.*
 import org.json.JSONObject
 import retrofit2.Call
@@ -52,6 +54,7 @@ class LoginActivity : AppCompatActivity() {
     lateinit var pin: EditText
     private var dialog: AlertDialog? = null
     private var queue: RequestQueue? = null
+    lateinit var apiService: APIService
 
 
 
@@ -68,7 +71,7 @@ class LoginActivity : AppCompatActivity() {
         apiSetvice = APIService.create()
         preferenceManager = PreferenceManager.getInstance(this)
         queue = Volley.newRequestQueue(this)
-
+        apiService = APIService.create()
 
         dialog = SpotsDialog.Builder()
                 .setContext(this)
@@ -157,6 +160,7 @@ class LoginActivity : AppCompatActivity() {
                     preferenceManager.mobileNo = loginResponce.data.mobile
                     preferenceManager.userName = loginResponce.data.name
                     getTapriType()
+                    fetchAssignedHubDetails()
                 }else{
                     Toast.makeText(applicationContext,"Not A User! Register First",Toast.LENGTH_LONG).show()
                     val intent = Intent(this,SpalshActivity::class.java)
@@ -239,6 +243,37 @@ class LoginActivity : AppCompatActivity() {
         NoNet.monitor(this)
                 .poll()
                 .snackbar()
+    }
+
+    private fun fetchAssignedHubDetails() {
+        mCompositeDisposable?.add(apiService.getHubDetails(preferenceManager.accessToken)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(this::handleResponse, this::handleErrors))
+
+    }
+
+    private fun handleResponse(responce: MappedHubResponce) {
+
+        if(responce.status == "Success"){
+            Toast.makeText(applicationContext,"Connected to Hub",Toast.LENGTH_SHORT).show()
+            Log.v("OnResponceMappedTapri: ",responce.status)
+            preferenceManager.setHubId(responce.data.hubId)
+            preferenceManager.setHubName(responce.data.name)
+
+        }else{
+            Toast.makeText(applicationContext,"Error!",Toast.LENGTH_SHORT).show()
+        }
+
+
+
+
+    }
+
+    private fun handleErrors(error: Throwable) {
+        Log.v("OnErrorMappedTapri",error.toString())
+        Toast.makeText(applicationContext,"Server Error!",Toast.LENGTH_SHORT).show()
+
     }
 
 

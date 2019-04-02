@@ -18,6 +18,7 @@ public class PreferenceManager {
     private static final String PREF_HUB_ADDRESS = "hub_address";
     private static final String PREF_HUB_AID = "hub_id";
     public static final String PREF_TAPRI_TYPE = "tapri_type";
+    public static final String PREF_HUB_NAME = "hub_name";
 
 
 
@@ -108,6 +109,17 @@ public class PreferenceManager {
      */
     public void setHubId(String id) {
         editor.putString(PREF_HUB_AID, id);
+        editor.commit();
+    }
+
+    public String getHubName()
+    {
+        String hubname = sInstance.getString(PREF_HUB_NAME,null);
+        return hubname;
+    }
+    public void setHubName(String name)
+    {
+        editor.putString(PREF_HUB_NAME,name);
         editor.commit();
     }
 

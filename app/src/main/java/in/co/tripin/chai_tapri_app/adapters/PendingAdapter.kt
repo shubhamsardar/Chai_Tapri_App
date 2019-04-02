@@ -39,12 +39,13 @@ class PendingAdapter(val data: List<PendingOrdersResponce.Datum>,
         holder.paymentmethod.text = paymentType;
         holder.orderId.text ="#"+data[position].shortId
         val timestamp = data[position].createdAt
-holder.orderDate.text = timestamp.substring(0,timestamp.indexOf('T'))
+        holder.orderDate.text = timestamp.substring(0,timestamp.indexOf('T'))
 
         holder.tvCustName.text = data[position].userId.fullName;
         if(data[position].userId.office!=null)
         {
-            holder.tvBlockName.text = data[position].userId.office.name+"/ "+data[position].userId.office.block.name
+            //holder.tvBlockName.text = "/ "+data[position].userId.office.block.name
+            holder.tvOfficeName.text =data[position].userId.office.name+"/ "+data[position].userId.office.officeCode+"/ "+data[position].userId.office.block.name
         }
 
         if(status == "accepted"){
@@ -108,8 +109,10 @@ holder.orderDate.text = timestamp.substring(0,timestamp.indexOf('T'))
         val paymentmethod= itemView.findViewById<TextView>(R.id.paymentmethod);
         val orderId = itemView.findViewById<TextView>(R.id.orderid)
         val orderDate = itemView.findViewById<TextView>(R.id.orderdate)
-        val tvCustName = itemView.findViewById<TextView>(R.id.tvCustName);
-        val tvBlockName = itemView.findViewById<TextView>(R.id.tvBlockName)
+        val tvCustName = itemView.findViewById<TextView>(R.id.tvCustomerName);
+        //val tvBlockName = itemView.findViewById<TextView>(R.id.tvBlockName)
+        val tvOfficeName = itemView.findViewById<TextView>(R.id.tvOfficeName)
+        //val tvOfficeCode = itemView.findViewById<TextView>(R.id.tvOfficeCode)
 
         fun bindItems(order : PendingOrdersResponce.Datum) = with(itemView)  {
 

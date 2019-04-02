@@ -35,9 +35,11 @@ public class MappedHubResponce {
         @SerializedName("hubId")
         @Expose
         private String hubId;
+
         @SerializedName("name")
         @Expose
         private String name;
+
         @SerializedName("address")
         @Expose
         private Address address;
