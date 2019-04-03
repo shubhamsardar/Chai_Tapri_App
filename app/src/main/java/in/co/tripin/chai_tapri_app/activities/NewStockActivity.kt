@@ -52,8 +52,7 @@ class NewStockActivity : AppCompatActivity() {
     lateinit var apiService: APIService
     private var mCompositeDisposable: CompositeDisposable? = null
     lateinit var hubsData: MappedHubResponce
-    lateinit var hubsItemPojo : HubItemsPojo
-
+    lateinit var hubsItemPojo: HubItemsPojo
 
 
     private var hubId: String? = ""
@@ -66,7 +65,6 @@ class NewStockActivity : AppCompatActivity() {
     private var mTotalCost: Double? = 0.0
     private var mAvailableBalance: Double? = 0.0
     internal var mMoneyTobeAdded: Double? = 0.0
-
 
 
     private var mSnacksList: RecyclerView? = null
@@ -98,10 +96,10 @@ class NewStockActivity : AppCompatActivity() {
     private var mAddresseHeader: LinearLayout? = null
 
     private var mChaihiyehll: LinearLayout? = null
-    private var mBeveragesll:LinearLayout? = null
-    private var mSnacksll:LinearLayout? = null
-    private var mExtrasll:LinearLayout? = null
-    private var mWalletInfo:LinearLayout? = null
+    private var mBeveragesll: LinearLayout? = null
+    private var mSnacksll: LinearLayout? = null
+    private var mExtrasll: LinearLayout? = null
+    private var mWalletInfo: LinearLayout? = null
     private var mItemsToggleText: TextView? = null
     private var mItemsList: LinearLayout? = null
     private var dialog: AlertDialog? = null
@@ -144,9 +142,9 @@ class NewStockActivity : AppCompatActivity() {
 
     private fun handleResponse(responce: MappedHubResponce) {
 
-        if(responce.status == "Success"){
-            Toast.makeText(applicationContext,"Connected to Hub",Toast.LENGTH_SHORT).show()
-            Log.v("OnResponceMappedTapri: ",responce.status)
+        if (responce.status == "Success") {
+            Toast.makeText(applicationContext, "Connected to Hub", Toast.LENGTH_SHORT).show()
+            Log.v("OnResponceMappedTapri: ", responce.status)
             preferenceManager.setHubId(responce.data.hubId)
             hubsData = responce
             preferenceManager.hubAddress = gson!!.toJson(responce.data.address)
@@ -157,18 +155,16 @@ class NewStockActivity : AppCompatActivity() {
             hubId = hubsData.data.hubId
             hubAddressId = hubsData.data.address.id
             proceedtopay.visibility = View.INVISIBLE
-        }else{
-            Toast.makeText(applicationContext,"Error!",Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(applicationContext, "Error!", Toast.LENGTH_SHORT).show()
         }
-
-
 
 
     }
 
     private fun handleError(error: Throwable) {
-        Log.v("OnErrorMappedTapri",error.toString())
-        Toast.makeText(applicationContext,"Server Error!",Toast.LENGTH_SHORT).show()
+        Log.v("OnErrorMappedTapri", error.toString())
+        Toast.makeText(applicationContext, "Server Error!", Toast.LENGTH_SHORT).show()
 
     }
 
@@ -268,13 +264,13 @@ class NewStockActivity : AppCompatActivity() {
                         java.lang.Double.toString(cost),
                         address,
                         paymentMethod,
-                        mItems,hubAddressId)
+                        mItems, hubAddressId)
 
                 if (!orderSummeryPOJO.getmItems().isEmpty()) {
 
-                        val i = Intent(this@NewStockActivity, OrderSummeryActivity::class.java)
-                        i.putExtra("ordersummery", orderSummeryPOJO)
-                        startActivity(i)
+                    val i = Intent(this@NewStockActivity, OrderSummeryActivity::class.java)
+                    i.putExtra("ordersummery", orderSummeryPOJO)
+                    startActivity(i)
 
 
                 } else {
@@ -284,7 +280,6 @@ class NewStockActivity : AppCompatActivity() {
 
             }
         }
-
 
 
     }
@@ -342,11 +337,9 @@ class NewStockActivity : AppCompatActivity() {
         mChaihiyehList!!.layoutManager = mLayoutManager3
 
 
-
-
     }
 
-    fun setAddress(){
+    fun setAddress() {
         mAddressCancel!!.visibility = View.GONE
         if (preferenceManager!!.getHubAddress() == null) {
             mAddressInclude!!.visibility = View.GONE
@@ -376,11 +369,11 @@ class NewStockActivity : AppCompatActivity() {
         }
     }
 
-    private fun hitHubtemsListAPI(hubId : String) {
+    private fun hitHubtemsListAPI(hubId: String) {
 
         Logger.v("getting menu...")
         dialog!!.show()
-        val url = Constants.BASE_URL+"api/v1/hub/$hubId/items/active"
+        val url = Constants.BASE_URL + "api/v1/hub/$hubId/items/active"
 
         val getRequest = object : JsonObjectRequest(Request.Method.GET, url, null,
                 Response.Listener { response ->
@@ -491,7 +484,6 @@ class NewStockActivity : AppCompatActivity() {
 
 
     }
-
 
 
     private fun setListVisiblity(data: HubItemsPojo.Data) {
