@@ -210,6 +210,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val intent = Intent(this, WalletActivity::class.java)
                 startActivity(intent)
             }
+            R.id.nav_credit -> {
+                val intent = Intent(this, CreditOrdersActivity::class.java)
+                startActivity(intent)
+            }
 
             R.id.nav_changepin -> {
                 val intent = Intent(this, ChangePinActivity::class.java)

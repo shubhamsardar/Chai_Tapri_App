@@ -14,6 +14,10 @@
                 android:id="@+id/nav_history"
                 android:icon="@drawable/ic_history_black_24dp"
                 android:title="Order History" />
+            <item
+                android:id="@+id/nav_credit"
+                android:icon="@drawable/ic_credit_card_black_24dp"
+                android:title="Credit Orders" />
 
             <item
                 android:id="@+id/nav_wallet"

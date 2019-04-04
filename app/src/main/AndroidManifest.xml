@@ -16,7 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activities.WalletActivity"></activity>
+        <activity android:name=".activities.CreditOrdersActivity"></activity>
+        <activity android:name=".activities.WalletActivity" />
         <activity
             android:name=".activities.SpalshActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
