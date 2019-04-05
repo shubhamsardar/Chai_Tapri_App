@@ -1,16 +1,27 @@
 package in.co.tripin.chai_tapri_app.activities;
 
+import android.content.Context;
 import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import in.co.tripin.chai_tapri_app.Helper.Constants;
+import in.co.tripin.chai_tapri_app.Helper.DateFormatHelper;
 import in.co.tripin.chai_tapri_app.Managers.PreferenceManager;
+import in.co.tripin.chai_tapri_app.POJOs.Responces.TransactionsResponce;
 import in.co.tripin.chai_tapri_app.POJOs.Responces.WalletResponce;
 import in.co.tripin.chai_tapri_app.R;
 import in.co.tripin.chai_tapri_app.services.WalletService;
@@ -22,8 +33,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class WalletActivity extends AppCompatActivity {
 
-    private TextView textViewWallet;
+    private TextView textViewWallet,tvUserName;
     PreferenceManager preferenceManager ;
+    CustomAdapter customAdapter;
+    ArrayList<TransactionsResponce.Data> transactionList;
+    ListView transactionListView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +45,9 @@ public class WalletActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         preferenceManager = PreferenceManager.getInstance(this);
         textViewWallet = (TextView)findViewById(R.id.textViewWallet);
+        tvUserName = (TextView)findViewById(R.id.tvUserName);
+        transactionListView = (ListView) findViewById(R.id.transactionList);
+
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -38,8 +55,13 @@ public class WalletActivity extends AppCompatActivity {
                     15, 60, 2, TypedValue.COMPLEX_UNIT_DIP);
         }
 
-        getCurrentWallet();
+        tvUserName.setText(preferenceManager.getUserName());
 
+
+
+
+        getCurrentWallet();
+        fetchTransactions();
     }
 
     @Override
@@ -49,6 +71,8 @@ public class WalletActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.action_refresh:
+                getCurrentWallet();
+                fetchTransactions();
                 //
             default:
                 return super.onOptionsItemSelected(item);
@@ -92,5 +116,67 @@ public class WalletActivity extends AppCompatActivity {
                 Log.d("Fail", t.getMessage());
             }
         });
+    }
+
+    public void fetchTransactions()
+    {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        WalletService  walletService = retrofit.create(WalletService.class);
+        Call<TransactionsResponce> call = walletService.getTransactions(preferenceManager.getAccessToken());
+        call.enqueue(new Callback<TransactionsResponce>() {
+            @Override
+            public void onResponse(Call<TransactionsResponce> call, retrofit2.Response<TransactionsResponce> response) {
+                if(response.isSuccessful())
+                {
+                    TransactionsResponce transactionsResponce = response.body();
+                    transactionList = (ArrayList<TransactionsResponce.Data>) transactionsResponce.getData();
+
+                    customAdapter = new CustomAdapter(WalletActivity.this, android.R.layout.simple_list_item_1, transactionList);
+                    transactionListView.setAdapter(customAdapter);
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TransactionsResponce> call, Throwable t) {
+
+            }
+        });
+
+    }
+
+    public class  CustomAdapter extends ArrayAdapter<TransactionsResponce.Data> {
+
+        Context context;
+        ArrayList<TransactionsResponce.Data> transactionList;
+        View view;
+
+        public CustomAdapter(@NonNull Context context, int resource, @NonNull ArrayList<TransactionsResponce.Data> transactionList) {
+            super(context, resource, transactionList);
+            this.context = context;
+            this.transactionList = transactionList;
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            view = getLayoutInflater().inflate(R.layout.custom_transactions, null);
+
+            TextView tvAmount = (TextView) view.findViewById(R.id.tvAmount);
+            TextView tvDate = (TextView) view.findViewById(R.id.tvDate);
+            TextView tvType = (TextView) view.findViewById(R.id.tvType);
+
+            tvAmount.setText("₹ " + transactionList.get(position).getAmount());
+
+            tvDate.setText(DateFormatHelper.getDisplayableDate(transactionList.get(position).getCreatedAt()));
+            tvType.setText(transactionList.get(position).getType());
+
+
+            return view;
+        }
     }
 }
