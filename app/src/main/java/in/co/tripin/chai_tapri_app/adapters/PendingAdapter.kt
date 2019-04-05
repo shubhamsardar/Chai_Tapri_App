@@ -77,6 +77,7 @@ class PendingAdapter(val data: List<PendingOrdersResponce.Datum>,
             }
 
         }
+
         holder.b2.setOnClickListener{
             if(status == "accepted"){
                 pendingOrdersInteractionCallback.onOrderSent(data[position].id)
