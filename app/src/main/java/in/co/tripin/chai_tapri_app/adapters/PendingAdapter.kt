@@ -72,6 +72,8 @@ class PendingAdapter(val data: List<PendingOrdersResponce.Datum>,
                 Logger.v("Mobile: ${data[position].UserId().mobile}")
             }else if(status == "ordered"){
                 pendingOrdersInteractionCallback.onOrderRejected(data[position].id)
+            } else if (status == "on the way") {
+                pendingOrdersInteractionCallback.onCalledCustomer(data[position].userId.mobile)
             }
 
         }
