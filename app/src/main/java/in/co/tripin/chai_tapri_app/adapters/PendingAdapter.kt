@@ -46,6 +46,7 @@ class PendingAdapter(val data: List<PendingOrdersResponce.Datum>,
         {
             holder.tvOfficeName.visibility=View.VISIBLE
             //holder.tvBlockName.text = "/ "+data[position].userId.office.block.name
+            holder.tvOfficeCode.text = data[position].userId.office.officeCode
             holder.tvOfficeName.text =data[position].userId.office.name+"/ "+data[position].userId.office.officeCode+"/ "+data[position].userId.office.block.name
         }
 
@@ -116,7 +117,7 @@ class PendingAdapter(val data: List<PendingOrdersResponce.Datum>,
         val tvCustName = itemView.findViewById<TextView>(R.id.tvCustomerName);
         //val tvBlockName = itemView.findViewById<TextView>(R.id.tvBlockName)
         val tvOfficeName = itemView.findViewById<TextView>(R.id.tvOfficeName)
-        //val tvOfficeCode = itemView.findViewById<TextView>(R.id.tvOfficeCode)
+        val tvOfficeCode = itemView.findViewById<TextView>(R.id.tvOfficeCode)
 
         fun bindItems(order : PendingOrdersResponce.Datum) = with(itemView)  {
 
